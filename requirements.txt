@@ -1,0 +1,7 @@
+dask
+h5py
+matplotlib
+numpy
+root_numpy
+scipy
+tqdm
