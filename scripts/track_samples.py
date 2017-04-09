@@ -25,7 +25,7 @@ if __name__ == "__main__":
     args = get_args()
 
     # Padding for unavailable tracks
-    default_value = np.nan
+    default_value = 0
 
     # Maximum number of tracks
     n_tracks = 20
@@ -48,10 +48,10 @@ if __name__ == "__main__":
 
     # Total length and length after selection for chunking and preallocation
     len_total = len(root2array(args.infiles, treename=treename,
-                               branches=branches[0]))
+                               branches=(branches[0], default_value, 1)))
     len_pass = len(root2array(args.infiles, treename=treename,
                               selection=opt_rnp["selection"],
-                              branches=branches[0]))
+                              branches=(branches[0], default_value, 1)))
 
     # h5py.Dataset kwargs
     opt_h5 = {

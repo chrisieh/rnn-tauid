@@ -62,7 +62,8 @@ def lstm_shared_weights(input_shape, dense_units=8, lstm_units=64,
     x = Input(shape=input_shape)
     mask = Masking(mask_value=mask_value)(x)
     shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
-    lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(shared_dense)
+    lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(
+        shared_dense)
     y = Dense(1, activation="sigmoid")(lstm)
 
     return Model(input=x, output=y)
@@ -94,8 +95,7 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     x_1 = Input(shape=input_shape_1)
     mask_1 = Masking(mask_value=mask_value)(x_1)
     lstm_1 = LSTM(output_dim=units_1, unroll=unroll, go_backwards=backwards)(
-        mask_1
-    )
+        mask_1)
     dropout_1 = Dropout(dropout_1)(lstm_1)
     dense_1 = Dense(interm_dense_1, activation="relu")(dropout_1)
 
@@ -103,8 +103,7 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     x_2 = Input(shape=input_shape_2)
     mask_2 = Masking(mask_value=mask_value)(x_2)
     lstm_2 = LSTM(output_dim=units_2, unroll=unroll, go_backwards=backwards)(
-        mask_2
-    )
+        mask_2)
     dropout_2 = Dropout(dropout_2)(lstm_2)
     dense_2 = Dense(interm_dense_2, activation="relu")(dropout_2)
 
