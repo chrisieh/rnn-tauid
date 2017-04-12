@@ -65,6 +65,10 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
         "TauJets.nTracks", &v_nTracks, "TauJets.nTracks/I");
     b_ptJetSeed = fOutTree->Branch(
         "TauJets.ptJetSeed", &v_ptJetSeed, "TauJets.ptJetSeed/F");
+    b_etaJetSeed = fOutTree->Branch(
+        "TauJets.etaJetSeed", &v_etaJetSeed, "TauJets.etaJetSeed/F");
+    b_phiJetSeed = fOutTree->Branch(
+        "TauJets.phiJetSeed", &v_phiJetSeed, "TauJets.phiJetSeed/F");
     b_mu = fOutTree->Branch(
         "TauJets.mu", &v_mu, "TauJets.mu/D");
     b_nVtxPU = fOutTree->Branch(
@@ -138,7 +142,24 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
         "TauTracks.isConversion", &v_trk_isConversion);
     b_trk_isFakeOrIsolation = fOutTree->Branch(
         "TauTracks.isFakeOrIsolation", &v_trk_isFakeOrIsolation);
-    
+
+    b_trk_nPixelHoles = fOutTree->Branch(
+        "TauTracks.nPixelHoles", &v_trk_nPixelHoles);
+    b_trk_nPixelDead = fOutTree->Branch(
+        "TauTracks.nPixelDead", &v_trk_nPixelDead);
+    b_trk_nSCTHits = fOutTree->Branch(
+        "TauTracks.nSCTHits", &v_trk_nSCTHits);
+    b_trk_nSCTHoles = fOutTree->Branch(
+        "TauTracks.nSCTHoles", &v_trk_nSCTHoles);
+    b_trk_nSCTDead = fOutTree->Branch(
+        "TauTracks.nSCTDead", &v_trk_nSCTDead);
+    b_trk_nSCTDoubleHoles = fOutTree->Branch(
+        "TauTracks.nSCTDoubleHoles", &v_trk_nSCTDoubleHoles);
+    b_trk_nTRTHits = fOutTree->Branch(
+        "TauTracks.nTRTHits", &v_trk_nTRTHits);
+    b_trk_nTRTDead = fOutTree->Branch(
+        "TauTracks.nTRTDead", &v_trk_nTRTDead);
+
     // Set cluster branches
     b_cls_nClustersTotal = fOutTree->Branch("TauJets.nClustersTotal", &v_cls_nClustersTotal);
     b_cls_e = fOutTree->Branch("TauClusters.e", &v_cls_e);
@@ -218,6 +239,15 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_trk_isConversion.clear();
         v_trk_isFakeOrIsolation.clear();
 
+        v_trk_nPixelHoles.clear();
+        v_trk_nPixelDead.clear();
+        v_trk_nSCTHits.clear();
+        v_trk_nSCTHoles.clear();
+        v_trk_nSCTDead.clear();
+        v_trk_nSCTDoubleHoles.clear();
+        v_trk_nTRTHits.clear();
+        v_trk_nTRTDead.clear();
+        
         // Clear cluster vectors
         v_cls_e.clear();
         v_cls_et.clear();
@@ -251,6 +281,8 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_phi = reader_phi[itau];
         v_nTracks = reader_nTracks[itau];
         v_ptJetSeed = reader_ptJetSeed[itau];
+        v_etaJetSeed = reader_etaJetSeed[itau];
+        v_phiJetSeed = reader_phiJetSeed[itau];
         v_mu = reader_mu[itau];
         v_nVtxPU = reader_nVtxPU[itau];
         v_centFrac = reader_centFrac[itau];
@@ -297,6 +329,15 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
             v_trk_isCharged.push_back(trackClassification == 3 ? 1 : 0);
             v_trk_isConversion.push_back(trackClassification == 2 ? 1 : 0);
             v_trk_isFakeOrIsolation.push_back(trackClassification == 1 ? 1 : 0);
+
+            v_trk_nPixelHoles.push_back(reader_trk_nPixelHoles[itau][itrack]);
+            v_trk_nPixelDead.push_back(reader_trk_nPixelDead[itau][itrack]);
+            v_trk_nSCTHits.push_back(reader_trk_nSCTHits[itau][itrack]);
+            v_trk_nSCTHoles.push_back(reader_trk_nSCTHoles[itau][itrack]);
+            v_trk_nSCTDead.push_back(reader_trk_nSCTDead[itau][itrack]);
+            v_trk_nSCTDoubleHoles.push_back(reader_trk_nSCTDoubleHoles[itau][itrack]);
+            v_trk_nTRTHits.push_back(reader_trk_nTRTHits[itau][itrack]);
+            v_trk_nTRTDead.push_back(reader_trk_nTRTDead[itau][itrack]);
         }
         
         for (size_t icluster = 0; icluster < reader_cls_e[itau].size(); icluster++)
@@ -315,7 +356,7 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
             v_cls_SECOND_LAMBDA.push_back(reader_cls_SECOND_LAMBDA[itau][icluster]);
             v_cls_FIRST_ENG_DENS.push_back(reader_cls_FIRST_ENG_DENS[itau][icluster]);
             v_cls_CENTER_LAMBDA.push_back(reader_cls_CENTER_LAMBDA[itau][icluster]);
-            v_cls_ENG_FRAC_MAX.push_back(reader_cls_ENG_FRAC_MAX[itau][icluster]);            
+            v_cls_ENG_FRAC_MAX.push_back(reader_cls_ENG_FRAC_MAX[itau][icluster]);
         }
 
         fOutTree->Fill();

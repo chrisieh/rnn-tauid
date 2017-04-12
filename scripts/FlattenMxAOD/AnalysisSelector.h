@@ -44,6 +44,8 @@ class AnalysisSelector : public TSelector
     TRA_int reader_nTracks = {fReader, "TauJetsAuxDyn.nTracks"};
     TRA_float reader_pt = {fReader, "TauJetsAuxDyn.pt"};
     TRA_float reader_ptJetSeed = {fReader, "TauJetsAuxDyn.trk_ptJetSeed"};
+    TRA_float reader_etaJetSeed = {fReader, "TauJetsAuxDyn.trk_etaJetSeed"};
+    TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"};
     TRA_float reader_eta = {fReader, "TauJetsAuxDyn.eta"};
     TRA_float reader_phi = {fReader, "TauJetsAuxDyn.phi"};
     
@@ -83,6 +85,15 @@ class AnalysisSelector : public TSelector
     TRA_vfloat reader_trk_eProbabilityHT = {fReader, "TauJetsAuxDyn.trk_eProbabilityHT"};
     TRA_vuint8 reader_trk_trackClassification = {fReader, "TauJetsAuxDyn.trk_classification"};
 
+    TRA_vuint8 reader_trk_nPixelHoles = {fReader, "TauJetsAuxDyn.trk_nPixelHoles"};
+    TRA_vuint8 reader_trk_nPixelDead = {fReader, "TauJetsAuxDyn.trk_nPixelDead"};
+    TRA_vuint8 reader_trk_nSCTHits = {fReader, "TauJetsAuxDyn.trk_nSCTHits"};
+    TRA_vuint8 reader_trk_nSCTHoles = {fReader, "TauJetsAuxDyn.trk_nSCTHoles"};
+    TRA_vuint8 reader_trk_nSCTDead = {fReader, "TauJetsAuxDyn.trk_nSCTDead"};
+    TRA_vuint8 reader_trk_nSCTDoubleHoles = {fReader, "TauJetsAuxDyn.trk_nSCTDoubleHoles"};
+    TRA_vuint8 reader_trk_nTRTHits = {fReader, "TauJetsAuxDyn.trk_nTRTHits"};
+    TRA_vuint8 reader_trk_nTRTDead = {fReader, "TauJetsAuxDyn.trk_nTRTDead"};
+
     // Cluster variables
     TRA_uint8 reader_cls_nClustersTotal = {fReader, "TauJetsAuxDyn.cls_nClustersTotal"};
     TRA_vfloat reader_cls_e = {fReader, "TauJetsAuxDyn.cls_e"};
@@ -113,6 +124,8 @@ class AnalysisSelector : public TSelector
     int v_nTracks;
     float v_pt;
     float v_ptJetSeed;
+    float v_etaJetSeed;
+    float v_phiJetSeed;
     float v_eta;
     float v_phi;
     double v_mu;
@@ -154,6 +167,15 @@ class AnalysisSelector : public TSelector
     std::vector<uint8_t> v_trk_isConversion;
     std::vector<uint8_t> v_trk_isFakeOrIsolation;
 
+    std::vector<uint8_t> v_trk_nPixelHoles;
+    std::vector<uint8_t> v_trk_nPixelDead;
+    std::vector<uint8_t> v_trk_nSCTHits;
+    std::vector<uint8_t> v_trk_nSCTHoles;
+    std::vector<uint8_t> v_trk_nSCTDead;
+    std::vector<uint8_t> v_trk_nSCTDoubleHoles;
+    std::vector<uint8_t> v_trk_nTRTHits;
+    std::vector<uint8_t> v_trk_nTRTDead;
+
     // Cluster variables
     int v_cls_nClustersTotal;
     vfloat v_cls_e;
@@ -187,6 +209,8 @@ class AnalysisSelector : public TSelector
     TBranch *b_phi = 0;
     TBranch *b_nTracks = 0;
     TBranch *b_ptJetSeed = 0;
+    TBranch *b_etaJetSeed = 0;
+    TBranch *b_phiJetSeed = 0;
     TBranch *b_mu = 0;
     TBranch *b_nVtxPU = 0;
     TBranch *b_centFrac = 0;
@@ -225,6 +249,15 @@ class AnalysisSelector : public TSelector
     TBranch *b_trk_isCharged = 0;
     TBranch *b_trk_isConversion = 0;
     TBranch *b_trk_isFakeOrIsolation = 0;
+
+    TBranch *b_trk_nPixelHoles = 0;
+    TBranch *b_trk_nPixelDead = 0;
+    TBranch *b_trk_nSCTHits = 0;
+    TBranch *b_trk_nSCTHoles = 0;
+    TBranch *b_trk_nSCTDead = 0;
+    TBranch *b_trk_nSCTDoubleHoles = 0;
+    TBranch *b_trk_nTRTHits = 0;
+    TBranch *b_trk_nTRTDead = 0;
 
     // Cluster branches
     TBranch *b_cls_nClustersTotal = 0;
