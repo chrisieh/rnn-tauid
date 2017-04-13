@@ -1,7 +1,6 @@
 import argparse
 
 import numpy as np
-from root_numpy import root2array, list_branches
 import h5py
 from tqdm import tqdm
 
@@ -24,6 +23,9 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
 
+    # Import here to avoid root taking over the command line
+    from root_numpy import root2array, list_branches
+    
     # Padding for unavailable tracks
     default_value = 0
 
@@ -32,8 +34,6 @@ if __name__ == "__main__":
     treename = "CollectionTree"
     prefix = "TauClusters"
     h5group = "cluster"
-    # Names of derived fields
-    add_fields = []
 
     # Get branches
     branches = list_branches(args.infiles[0], treename="CollectionTree")
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     }
 
     # dtype for single cluster
-    dt = np.dtype([(var, np.float32) for var in branches + add_fields])
+    dt = np.dtype([(var, np.float32) for var in branches])
 
     # Maximum buffer size in bytes
     buffer_bytes = 512 * 1024**2
@@ -86,8 +86,12 @@ if __name__ == "__main__":
             for var in branches:
                 buffer[:chunk_len][var] = chunk[var]
 
-            # Implementation of derived fields
-            # None
+            # Set clusters with all zeros to nan
+            view = buffer[:chunk_len].view(np.float32).reshape(
+                buffer[:chunk_len].shape + (-1,))
+            all_zero = np.all(view == 0, axis=2, keepdims=True)
+            mask = np.broadcast_to(all_zero, view.shape)
+            view[mask] = np.nan
 
             ds[write_pos:write_pos+chunk_len] = buffer[:chunk_len]
             write_pos += chunk_len

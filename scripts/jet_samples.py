@@ -1,7 +1,6 @@
 import argparse
 
 import numpy as np
-from root_numpy import root2array, list_branches
 import h5py
 from tqdm import tqdm
 
@@ -24,11 +23,12 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
 
+    # Import here to avoid root taking over the command line
+    from root_numpy import root2array, list_branches
+    
     treename = "CollectionTree"
     prefix = "TauJets"
     h5group = "jet"
-    # Names of derived fields
-    add_fields = []
 
     # Get branches
     branches = list_branches(args.infiles[0], treename="CollectionTree")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     }
 
     # dtype for single track
-    dt = np.dtype([(var, np.float32) for var in branches + add_fields])
+    dt = np.dtype([(var, np.float32) for var in branches])
 
     # Maximum buffer size in bytes
     buffer_bytes = 512 * 1024**2
@@ -79,9 +79,6 @@ if __name__ == "__main__":
             # Move chunk into buffer
             for var in branches:
                 buffer[:chunk_len][var] = chunk[var]
-
-            # Implementation of derived fields
-            # None
 
             ds[write_pos:write_pos+chunk_len] = buffer[:chunk_len]
             write_pos += chunk_len
