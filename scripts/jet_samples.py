@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # Import here to avoid root taking over the command line
     from root_numpy import root2array, list_branches
-    
+
     treename = "CollectionTree"
     prefix = "TauJets"
     h5group = "jet"
@@ -52,6 +52,7 @@ if __name__ == "__main__":
     opt_h5 = {
         "compression": "gzip",
         "compression_opts": 9,
+        "shuffle": True,
         "fletcher32": True
     }
 

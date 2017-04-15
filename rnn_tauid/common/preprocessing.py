@@ -1,67 +1,40 @@
-import h5py
 import numpy as np
 
 
-def mean_std(arr):
-    if len(arr.shape) == 1:
-        arr = arr.reshape((-1, 1))
+def scale(arr, mean=True, std=True):
+    offset = np.zeros(arr.shape[1], dtype=np.float32)
+    scale = np.ones(arr.shape[1], dtype=np.float32)
 
-    offset = np.nanmean(arr, axis=0)
-    scale = np.nanstd(arr, axis=0)
-
-    return offset, scale
-
-
-def median_percentile(arr):
-    if len(arr.shape) == 1:
-        arr = arr.reshape((-1, 1))
-
-    offset = np.nanmedian(arr, axis=0)
-    scale = np.nanstd(arr, axis=0)
+    if mean:
+        np.nanmean(arr, out=offset, axis=0)
+    if std:
+        np.nanstd(arr, out=scale, axis=0)
 
     return offset, scale
 
 
-def preprocess(files, start=0, stop=None):
-    offset_scale = []
-    for filename, groupname in files:
-        with h5py.File(filename, "r") as file:
-            ds = file[groupname]
+def robust_scale(arr, median=True, interquartile=True):
+    offset = np.zeros(arr.shape[1], dtype=np.float32)
+    scale = np.ones(arr.shape[1], dtype=np.float32)
 
-            if len(ds.shape) == 1:
-                shape = (1,)
-            else:
-                n, m = ds.shape
-                shape = (1, m)
+    if median:
+        np.nanmedian(arr, out=offset, axis=0)
+    if interquartile:
+        perc = np.nanpercentile(arr, [75.0, 25.0], axis=0)
+        np.subtract.reduce(perc, out=scale)
 
-            offset = np.zeros(shape, dtype=ds.dtype)
-            scale = np.ones(shape, dtype=ds.dtype)
+    return offset, scale
 
-            if len(ds.shape) == 1:
-                it = [slice(start, stop)]
-            else:
-                it = [(slice(start, stop), i) for i in range(m)]
 
-            for s in it:
-                data = ds[s]
-                view = data.view(np.float32).reshape(data.shape + (-1,))
+def max_scale(arr):
+    offset = np.zeros(arr.shape[1], dtype=np.float32)
+    scale = np.nanmax(arr, axis=0)
 
-                median = np.nanmedian(view, axis=0)
-                perc_low = np.nanpercentile(view, 25.0, axis=0)
-                perc_high = np.nanpercentile(view, 75.0, axis=0)
+    return offset, scale
 
-                if len(data) == 1:
-                    offset_view = offset.view(np.float32)
-                    scale_view = scale.view(np.float32)
-                else:
-                    n, m = s
-                    offset_view = offset[m].view(np.float32)
-                    scale_view = scale[m].view(np.float32)
 
-                offset_view[...] = median
-                # TODO: check if zero
-                scale_view[...] = perc_high - perc_low
+def constant_scale(arr, offset=0.0, scale=1.0):
+    offset = np.full(arr.shape[1], fill_value=offset, dtype=np.float32)
+    scale = np.full(arr.shape[1], fill_value=scale, dtype=np.float32)
 
-            offset_scale.append((offset, scale))
-
-    return offset_scale
+    return offset, scale
