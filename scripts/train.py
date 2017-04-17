@@ -82,6 +82,9 @@ for i, (var, func) in enumerate(invars):
 
 # Save offsets and scales from preprocessing
 with h5py.File("preprocessing.h5", "w") as f:
+    # Save variable names
+    f["variables"] = np.array([var for var, _ in invars], "S")
+    # Save preprocessing
     for var, (offset, scale) in preprocessing.items():
         f[var + "/offset"] = offset
         f[var + "/scale"] = scale
