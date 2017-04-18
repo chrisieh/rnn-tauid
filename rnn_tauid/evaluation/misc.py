@@ -1,5 +1,8 @@
+from collections import namedtuple
+
 import numpy as np
 import sklearn.metrics as metrics
+from scipy.stats import binned_statistic
 
 
 def roc_curve(y_true, y_score, **kwargs):
@@ -29,3 +32,35 @@ def efficiency_error(n, m):
     https://www.pp.rhul.ac.uk/~cowan/stat/notes/efferr.pdf
     """
     return np.sqrt((m + 1) / (n + 2) * ((m + 2) / (n + 3) - (m + 1) / (n + 2)))
+
+
+def binned_efficiency(x, passes, **kwargs):
+    """
+    Calculates the efficiency in bins of 'x'.
+
+    Returns:
+    --------
+    EfficiencyResult : namedtuple [mean, std, bin_edges]
+        Mean and standard deviation of the efficiency in bins of 'x' with edges
+        'bin_edges'.
+    """
+    def eff(arr):
+        m = float(np.count_nonzero(arr))
+        n = float(len(arr))
+        return m / n
+
+    def deff(arr):
+        m = float(np.count_nonzero(arr))
+        n = float(len(arr))
+        return efficiency_error(n, m)
+
+    mean = binned_statistic(x, passes, statistic=eff, **kwargs)
+    std = binned_statistic(x, passes, statistic=deff, **kwargs)
+
+    assert np.isclose(mean.bin_edges, std.bin_edges, rtol=1e-6, atol=0)
+
+    EfficiencyResult = namedtuple("EfficiencyResult",
+                                  ["mean", "std", "bin_edges"])
+
+    return EfficiencyResult(mean=mean.statistic, std=std.statistic,
+                            bin_edges=mean.bin_edges)
