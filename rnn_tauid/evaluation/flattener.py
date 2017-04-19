@@ -51,7 +51,7 @@ class Flattener:
         passes_thr : (N,) array of bools
             Array indicating which of the inputs pass the working point.
         """
-        if not self.cutmap:
+        if self.cutmap is None:
             return None
 
         _, _, _, binnumber = binned_statistic_2d(

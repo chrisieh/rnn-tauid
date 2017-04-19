@@ -13,14 +13,16 @@ def scale(arr, mean=True, std=True):
     return offset, scale
 
 
-def robust_scale(arr, median=True, interquartile=True):
+def robust_scale(arr, median=True, interquartile=True,
+                 low_perc=25.0, high_perc=75.0):
     offset = np.zeros(arr.shape[1], dtype=np.float32)
     scale = np.ones(arr.shape[1], dtype=np.float32)
 
     if median:
         np.nanmedian(arr, out=offset, axis=0)
     if interquartile:
-        perc = np.nanpercentile(arr, [75.0, 25.0], axis=0)
+        assert high_perc > low_perc
+        perc = np.nanpercentile(arr, [high_perc, low_perc], axis=0)
         np.subtract.reduce(perc, out=scale)
 
     return offset, scale

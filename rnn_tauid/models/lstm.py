@@ -70,10 +70,10 @@ def lstm_shared_weights(input_shape, dense_units=8, lstm_units=64,
 
 
 def lstm_two_branches(input_shape_1, input_shape_2,
-                      units_1=128, units_2=128,
-                      dropout_1=0.5, dropout_2=0.5,
-                      interm_dense_1=16, interm_dense_2=16,
-                      backwards=False, mask_value=0.0, unroll=True):
+                      dense_units_1=32, dense_units_2=32,
+                      lstm_units_1=32, lstm_units_2=32,
+                      backwards_1=False, backwards_2=False,
+                      mask_value=0.0, unroll=True):
     """
     Recurrent neural network with two branches
 
@@ -82,35 +82,31 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     input_shape_1 / input_shape_2 : tuple
         Shape of the inputs to both branches.
 
-    units_1 / units_2 : integer
+    dense_units_1 / dense_units_2 : integer
+        Size of the dense layers.
+
+    lstm_units_1 / lstm_units_2 : integer
         Size of the hidden state of the LSTMs.
-
-    dropout_1 / dropout_2 : float
-        Dropout after the LSTMs.
-
-    interm_dense_1 / interm_dense_2 : int
-        Size of the dense layers after the LSTM.
     """
     # Branch 1
     x_1 = Input(shape=input_shape_1)
     mask_1 = Masking(mask_value=mask_value)(x_1)
-    lstm_1 = LSTM(output_dim=units_1, unroll=unroll, go_backwards=backwards)(
-        mask_1)
-    dropout_1 = Dropout(dropout_1)(lstm_1)
-    dense_1 = Dense(interm_dense_1, activation="relu")(dropout_1)
+    shared_dense_1 = TimeDistributed(
+        Dense(dense_units_1, activation="tanh"))(mask_1)
+    lstm_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
+                  go_backwards=backwards)(shared_dense_1)
 
     # Branch 2
     x_2 = Input(shape=input_shape_2)
     mask_2 = Masking(mask_value=mask_value)(x_2)
-    lstm_2 = LSTM(output_dim=units_2, unroll=unroll, go_backwards=backwards)(
-        mask_2)
-    dropout_2 = Dropout(dropout_2)(lstm_2)
-    dense_2 = Dense(interm_dense_2, activation="relu")(dropout_2)
+    shared_dense_2 = TimeDistributed(
+        Dense(dense_units_2, activation="tanh"))(mask_2)
+    lstm_2 = LSTM(output_dim=lstm_units_2, unroll=unroll,
+                  go_backwards=backwards)(shared_dense_2)
 
     # Merge
-    merge_branches = merge([dense_1, dense_2], mode="concat")
+    merged_branches = merge([lstm_1, lstm_2], mode="concat")
 
-    # Final dense
-    y = Dense(1, activation="sigmoid")(merge_branches)
+    y = Dense(1, activation="sigmoid")(merged_branches)
 
     return Model(input=[x_1, x_2], output=y)

@@ -21,7 +21,7 @@ invars = [
     ("TauTracks.nSiHits", partial(constant_scale, scale=25))
 ]
 
-with h5py.File("outf.h5", "r") as f:
+with h5py.File("track_features.h5", "r") as f:
     dataf = f["data"]
     label = f["label"][...]
     weight = f["weight"][...]
@@ -81,7 +81,7 @@ for i, (var, func) in enumerate(invars):
     x_test[np.isnan(x_test)] = 0
 
 # Save offsets and scales from preprocessing
-with h5py.File("preprocessing.h5", "w") as f:
+with h5py.File("track_preproc.h5", "w") as f:
     # Save variable names
     f["variables"] = np.array([var for var, _ in invars], "S")
     # Save preprocessing
@@ -103,7 +103,7 @@ model.compile(loss="binary_crossentropy", optimizer="adam",
 
 # Configure callbacks
 early_stopping = EarlyStopping(monitor="val_loss", patience=10, verbose=1)
-model_checkpoint = ModelCheckpoint("model.h5",
+model_checkpoint = ModelCheckpoint("track_model.h5",
                                    monitor="val_loss", save_best_only=True,
                                    verbose=1)
 

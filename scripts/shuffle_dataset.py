@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
             data_out = outfile.create_dataset(
                 name, data_in.shape, dtype=data_in.dtype, compression="gzip",
-                fletcher32=True)
+                compression_opts=9, shuffle=True, fletcher32=True)
 
             if len(data_in.shape) == 1:
                 # If array one dimensional shuffle everything at once
