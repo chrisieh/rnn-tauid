@@ -15,8 +15,16 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
 
-    with h5py.File(args.infile, "r") as infile, \
-            h5py.File(args.outfile, "w") as outfile:
+    h5f_opt = {}
+    if "%d" in args.infile:
+        if not "%d" in args.outfile:
+            raise Exception("Needs %d format string in outfile")
+        
+        h5f_opt["driver"] = "family"
+        h5f_opt["memb_size"] = 10 * 1024 ** 3
+
+    with h5py.File(args.infile, "r", **h5f_opt) as infile, \
+         h5py.File(args.outfile, "w", **h5f_opt) as outfile:
         # Length of datasets for compatibility check
         ds_len = None
 

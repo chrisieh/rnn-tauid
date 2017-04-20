@@ -1,6 +1,7 @@
 from keras.models import Model
 from keras.layers import Input, Dense, LSTM, Masking, Dropout, \
                          TimeDistributed, merge
+from keras.layers.normalization import BatchNormalization
 
 
 def lstm_simple(input_shape, lstm_units=128, dropout=None, backwards=False,
@@ -110,3 +111,33 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     y = Dense(1, activation="sigmoid")(merged_branches)
 
     return Model(input=[x_1, x_2], output=y)
+
+
+def lstm_batch_norm(input_shape, dense_units=8, lstm_units=64,
+                    backwards=False, mask_value=0.0, unroll=True):
+    """
+    Recurrent neural network with shared weights at input, batch normalization 
+    and a single LSTM layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units : int
+        Number of units of the dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
+    bn = BatchNormalization()(shared_dense)
+    lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(bn)
+    y = Dense(1, activation="sigmoid")(lstm)
+
+    return Model(input=x, output=y)
