@@ -95,7 +95,7 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     shared_dense_1 = TimeDistributed(
         Dense(dense_units_1, activation="tanh"))(mask_1)
     lstm_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
-                  go_backwards=backwards)(shared_dense_1)
+                  go_backwards=backwards_1)(shared_dense_1)
 
     # Branch 2
     x_2 = Input(shape=input_shape_2)
@@ -103,7 +103,7 @@ def lstm_two_branches(input_shape_1, input_shape_2,
     shared_dense_2 = TimeDistributed(
         Dense(dense_units_2, activation="tanh"))(mask_2)
     lstm_2 = LSTM(output_dim=lstm_units_2, unroll=unroll,
-                  go_backwards=backwards)(shared_dense_2)
+                  go_backwards=backwards_2)(shared_dense_2)
 
     # Merge
     merged_branches = merge([lstm_1, lstm_2], mode="concat")
