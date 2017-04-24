@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--test-size", type=float, default=0.25)
     parser.add_argument("--dense-units", type=int, default=32)
-    parser.add_argument("--lstm-units", type=int, default=32)
+    parser.add_argument("--lstm-units", type=int, default=24)
     parser.add_argument("--csv-log", default=None)
     parser.add_argument("--var-mod", default=None)
     
