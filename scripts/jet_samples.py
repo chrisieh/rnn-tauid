@@ -12,7 +12,9 @@ def get_args():
     parser.add_argument("outfile",
                         help="Output file")
     parser.add_argument("selection",
-                        choices=["truth1p", "1p", "truth3p", "3p"],
+                        choices=["truth1p", "1p",
+                                 "truth3p", "3p",
+                                 "truthXp", "Xp"],
                         help="Selection to apply to the taus")
     parser.add_argument("infiles", nargs="+",
                         help="Input root files with flattened containers")
