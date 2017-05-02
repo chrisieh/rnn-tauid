@@ -8,7 +8,7 @@ from scipy.stats import binned_statistic
 def bin_center(bins):
     """
     Returns the bin centers given by the bin edges 'bins'.
-    
+
     Parameters:
     -----------
     bins : array (N,)
@@ -25,7 +25,7 @@ def bin_center(bins):
 def bin_width(bins):
     """
     Returns the bin widths given by the bin edges 'bins'.
-    
+
     Parameters:
     -----------
     bins : array (N,)
@@ -84,7 +84,7 @@ def binned_efficiency(x, passes, **kwargs):
 
         if n == 0:
             return np.nan
-        
+
         return m / n
 
     def deff(arr):
@@ -93,7 +93,7 @@ def binned_efficiency(x, passes, **kwargs):
 
         if n == 0:
             return np.nan
-        
+
         return efficiency_error(n, m)
 
     mean = binned_statistic(x, passes, statistic=eff, **kwargs)
@@ -109,7 +109,7 @@ def binned_efficiency(x, passes, **kwargs):
 def binned_rejection(eff):
     """
     Calcualtes the rejection from a 'EfficiencyResult'.
-    
+
     Parameters:
     -----------
     eff : EfficiencyResult
@@ -117,8 +117,22 @@ def binned_rejection(eff):
     """
     mean = 1.0 / eff.mean
     std = eff.std / eff.mean ** 2
-    
+
     RejectionResult = namedtuple("RejectionResult",
                                  ["mean", "std", "bin_edges"])
 
     return RejectionResult(mean=mean, std=std, bin_edges=bin_edges.copy())
+
+
+def pearsonr(x, y, weights=None):
+    """
+    Calculates the Pearson correlation coefficient.
+
+    Parameters:
+    -----------
+    x : array (N,)
+    y : array (N,)
+    """
+    assert x.shape == y.shape
+    cov = np.cov(x, y, aweights=weights)
+    return cov[1,0] / np.sqrt(cov[0,0] * cov[1,1])

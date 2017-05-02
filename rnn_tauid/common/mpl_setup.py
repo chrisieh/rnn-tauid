@@ -7,6 +7,11 @@ def mpl_setup():
     mpl.rcParams["font.size"] = 11
     mpl.rcParams["mathtext.default"] = "regular"
 
+    mpl.rcParams["figure.subplot.bottom"] = 0.16
+    mpl.rcParams["figure.subplot.top"] = 0.95
+    mpl.rcParams["figure.subplot.left"] = 0.16
+    mpl.rcParams["figure.subplot.right"] = 0.95
+
     mpl.rcParams["axes.xmargin"] = 0.0
     mpl.rcParams["axes.ymargin"] = 0.0
 
