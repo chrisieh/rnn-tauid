@@ -54,8 +54,10 @@ def main(args):
     shape_1 = trk_train.x.shape[1:]
     shape_2 = cls_train.x.shape[1:]
     model = lstm_two_branches(shape_1, shape_2,
-                              dense_units_1=32, dense_units_2=32,
-                              lstm_units_1=32, lstm_units_2=24)
+                              dense_units_1=args.dense_units_1,
+                              dense_units_2=args.dense_units_2,
+                              lstm_units_1=args.lstm_units_1,
+                              lstm_units_2=args.lstm_units_2)
     model.summary()
     model.compile(loss="binary_crossentropy", optimizer="adam",
                   metrics=["accuracy"])
@@ -101,8 +103,10 @@ if __name__ == "__main__":
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--test-size", type=float, default=0.25)
-    parser.add_argument("--dense-units", type=int, default=32)
-    parser.add_argument("--lstm-units", type=int, default=32)
+    parser.add_argument("--dense-units-1", type=int, default=32)
+    parser.add_argument("--dense-units-2", type=int, default=32)
+    parser.add_argument("--lstm-units-1", type=int, default=32)
+    parser.add_argument("--lstm-units-2", type=int, default=24)
     parser.add_argument("--csv-log", default=None)
     parser.add_argument("--trk-var", default=None)
     parser.add_argument("--cls-var", default=None)
