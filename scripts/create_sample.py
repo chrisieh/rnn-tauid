@@ -47,7 +47,7 @@ if __name__ == "__main__":
     from root_numpy import root2array, list_branches
 
     # Branches to load
-    branches = list_banches(args.infiles[0], treename=treename)
+    branches = list_branches(args.infiles[0], treename=treename)
     jet_branches = [br for br in branches if br.startswith("TauJets")]
     track_branches = [br for br in branches if br.startswith("TauTracks")]
     cluster_branches = [br for br in branches if br.startswith("TauClusters")]
