@@ -70,6 +70,42 @@ def lstm_shared_weights(input_shape, dense_units=8, lstm_units=64,
     return Model(input=x, output=y)
 
 
+def lstm_shared_ffnn(input_shape, dense_units_1=32, dense_units_2=32,
+                     lstm_units=32, backwards=False, mask_value=0.0,
+                     unroll=True):
+    """
+    Recurrent neural network with a shared feedforward neural net at input and
+    a single LSTM layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units_1 : int
+        Number of units in the first dense layer with shared weights.
+    dense_units_2 : int
+        Number of units in the second dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense_1 = TimeDistributed(Dense(dense_units_1, activation="tanh"))(
+        mask)
+    shared_dense_2 = TimeDistributed(Dense(dense_units_2, activation="tanh"))(
+        shared_dense_1)
+    lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(
+        shared_dense_2)
+    y = Dense(1, activation="sigmoid")(lstm)
+
+    return Model(input=x, output=y)
+
+
 def lstm_two_branches(input_shape_1, input_shape_2,
                       dense_units_1=32, dense_units_2=32,
                       lstm_units_1=32, lstm_units_2=32,

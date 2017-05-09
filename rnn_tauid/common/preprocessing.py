@@ -40,3 +40,22 @@ def constant_scale(arr, offset=0.0, scale=1.0):
     scale = np.full(arr.shape[1], fill_value=scale, dtype=np.float32)
 
     return offset, scale
+
+
+def pt_reweight(sig_pt, bkg_pt):
+    # Binning
+    bin_edges = np.percentile(bkg_pt, np.linspace(0.0, 100.0, 50))
+    bin_edges[0] = 20000.0  # 20 GeV lower limit
+    bin_edges[-1] = 4000000.0  # 4000 GeV upper limit
+
+    # Reweighting coefficient
+    sig_hist, _ = np.histogram(sig_pt, bins=bin_edges, density=True)
+    bkg_hist, _ = np.histogram(bkg_pt, bins=bin_edges, density=True)
+
+    coeff = sig_hist / bkg_hist
+
+    # Apply reweighting
+    sig_weight = np.ones_like(sig_pt)
+    bkg_weight = coeff[np.digitize(bkg_pt, bin_edges) - 1].astype(np.float32)
+
+    return sig_weight, bkg_weight

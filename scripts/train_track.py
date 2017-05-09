@@ -1,7 +1,10 @@
 import argparse
 
+import numpy as np
+import h5py
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
-from rnn_tauid.models.lstm import lstm_shared_weights
+
+from rnn_tauid.models.lstm import lstm_shared_weights, lstm_shared_ffnn
 from rnn_tauid.training.load import load_data, train_test_split, preprocess, \
                                     save_preprocessing
 
@@ -14,14 +17,31 @@ def main(args):
         invars = var_mod.invars
     else:
         from rnn_tauid.common.variables import track_vars as invars
-    
-    variables = [var for var, func in invars]
-    funcs = [func for var, func in invars]
 
-    data = load_data(args.data, variables, num=args.num_tracks)
+    # Variable names
+    variables = [v for v, _, _ in invars]
+    # Preprocessing functions
+    f_preproc = [f for _, _, f in invars]
+
+    h5file = dict(driver="family", memb_size=10*1024**3)
+    with h5py.File(args.sig, "r", **h5file) as sig, \
+         h5py.File(args.bkg, "r", **h5file) as bkg:
+        lsig = len(sig["TauJets/pt"])
+        lbkg = len(bkg["TauJets/pt"])
+
+        sig_idx = int(args.fraction * lsig)
+        bkg_idx = int(args.fraction * lbkg)
+
+        sig_idx = min(sig_idx, bkg_idx)
+        bkg_idx = sig_idx
+
+        print("Loading sig [:{}] and bkg [:{}]".format(sig_idx, bkg_idx))
+        data = load_data(sig, bkg, np.s_[:sig_idx], np.s_[:bkg_idx],
+                         invars, args.num_tracks)
+        
     train, test = train_test_split(data, test_size=args.test_size)
+    preprocessing = preprocess(train, test, f_preproc)
 
-    preprocessing = preprocess(train, test, funcs)
     for var, (offset, scale) in zip(variables, preprocessing):
         print(var + ":")
         print("offsets:\n" + str(offset))
@@ -31,8 +51,11 @@ def main(args):
 
     # Setup training
     shape = train.x.shape[1:]
-    model = lstm_shared_weights(shape, dense_units=args.dense_units,
-                                lstm_units=args.lstm_units)
+    model = lstm_shared_ffnn(shape, dense_units_1=args.dense_units,
+                             dense_units_2=args.dense_units,
+                             lstm_units=args.lstm_units)
+    # model = lstm_shared_weights(shape, dense_units=args.dense_units,
+    #                             lstm_units=args.lstm_units)
     model.summary()
     model.compile(loss="binary_crossentropy", optimizer="adam",
               metrics=["accuracy"])
@@ -65,13 +88,14 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("data",
-                        help="Input data")
-    parser.add_argument("preprocessing",
-                        help="Preprocessing offsets and scales")
-    parser.add_argument("model",
-                        help="Model file")
-    parser.add_argument("--num-tracks", default=None)
+    parser.add_argument("sig", help="Input signal")
+    parser.add_argument("bkg", help="Input background")
+
+    parser.add_argument("--preprocessing", default="preproc.h5")
+    parser.add_argument("--model", default="model.h5")
+    
+    parser.add_argument("--fraction", type=float, default=0.2)
+    parser.add_argument("--num-tracks", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--epochs", type=int, default=100)
@@ -82,8 +106,4 @@ if __name__ == "__main__":
     parser.add_argument("--var-mod", default=None)
     
     args = parser.parse_args()
-
-    if args.num_tracks:
-        args.num_tracks = int(args.num_tracks)
-
     main(args)

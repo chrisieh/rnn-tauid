@@ -3,27 +3,49 @@ from collections import namedtuple
 import h5py
 import numpy as np
 
+from rnn_tauid.common.preprocessing import pt_reweight
+
 
 Data = namedtuple("Data", ["x", "y", "w"])
 
 
-def load_data(filename, variables, num=None):
-    with h5py.File(filename, "r") as f:
-        ds = f["data"]
+def load_data(sig, bkg, sig_slice, bkg_slice, invars, num=None):
+    # pt-reweighting
+    sig_pt = sig["TauJets/pt"][sig_slice]
+    bkg_pt = bkg["TauJets/pt"][bkg_slice]
 
-        label = f["label"][:]
-        weight = f["weight"][:]
+    sig_weight, bkg_weight = pt_reweight(sig_pt, bkg_pt)
+    w = np.concatenate([sig_weight, bkg_weight])
 
-        if not num:
-            _, num = ds[variables[0]].shape
+    sig_len = len(sig_pt)
+    bkg_len = len(bkg_pt)
 
-        shape = len(label), num, len(variables)
+    del sig_pt, bkg_pt
+    del sig_weight, bkg_weight
 
-        data = np.empty(shape, dtype=np.float32)
-        for i, var in enumerate(variables):
-            ds[var].read_direct(data, np.s_[...,:num], np.s_[..., i])
+    # Class labels
+    y = np.ones(sig_len + bkg_len, dtype=np.float32)
+    y[sig_len:] = 0
 
-    return Data(x=data, y=label, w=weight)
+    # Load variables
+    n_vars = len(invars)
+    x = np.empty((sig_len + bkg_len, num, n_vars))
+
+    sig_src = np.s_[sig_slice, :num]
+    bkg_src = np.s_[bkg_slice, :num]
+
+    for i, (varname, func, _) in enumerate(invars):
+        sig_dest = np.s_[:sig_len, ..., i]
+        bkg_dest = np.s_[sig_len:, ..., i]
+
+        if func:
+            func(sig, x, source_sel=sig_src, dest_sel=sig_dest)
+            func(bkg, x, source_sel=bkg_src, dest_sel=bkg_dest)
+        else:
+            sig[varname].read_direct(x, source_sel=sig_src, dest_sel=sig_dest)
+            bkg[varname].read_direct(x, source_sel=bkg_src, dest_sel=bkg_dest)
+
+    return Data(x=x, y=y, w=w)
 
 
 def parallel_shuffle(sequences):
