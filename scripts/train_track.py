@@ -4,7 +4,7 @@ import numpy as np
 import h5py
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 
-from rnn_tauid.models.lstm import lstm_shared_weights, lstm_shared_ffnn
+from rnn_tauid.models.lstm import lstm_shared_weights
 from rnn_tauid.training.load import load_data, train_test_split, preprocess, \
                                     save_preprocessing
 
@@ -32,9 +32,6 @@ def main(args):
         sig_idx = int(args.fraction * lsig)
         bkg_idx = int(args.fraction * lbkg)
 
-        sig_idx = min(sig_idx, bkg_idx)
-        bkg_idx = sig_idx
-
         print("Loading sig [:{}] and bkg [:{}]".format(sig_idx, bkg_idx))
         data = load_data(sig, bkg, np.s_[:sig_idx], np.s_[:bkg_idx],
                          invars, args.num_tracks)
@@ -51,11 +48,8 @@ def main(args):
 
     # Setup training
     shape = train.x.shape[1:]
-    model = lstm_shared_ffnn(shape, dense_units_1=args.dense_units,
-                             dense_units_2=args.dense_units,
-                             lstm_units=args.lstm_units)
-    # model = lstm_shared_weights(shape, dense_units=args.dense_units,
-    #                             lstm_units=args.lstm_units)
+    model = lstm_shared_weights(shape, dense_units=args.dense_units,
+                                lstm_units=args.lstm_units)
     model.summary()
     model.compile(loss="binary_crossentropy", optimizer="adam",
               metrics=["accuracy"])
@@ -99,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--epochs", type=int, default=100)
-    parser.add_argument("--test-size", type=float, default=0.25)
+    parser.add_argument("--test-size", type=float, default=0.2)
     parser.add_argument("--dense-units", type=int, default=32)
     parser.add_argument("--lstm-units", type=int, default=32)
     parser.add_argument("--csv-log", default=None)
