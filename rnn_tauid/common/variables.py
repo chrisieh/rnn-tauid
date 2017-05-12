@@ -1,14 +1,38 @@
 from functools import partial
 
 import numpy as np
-from rnn_tauid.common.preprocessing import scale, robust_scale, constant_scale
+from rnn_tauid.common.preprocessing import scale, scale_flat, robust_scale, \
+                                           constant_scale
 
 
-# Functons to calculate additional variables
-def pt_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauTracks/pt"].read_direct(dest, source_sel=source_sel,
-                                         dest_sel=dest_sel)
+# Template for log10(x + epsilon)
+def log10_epsilon(datafile, dest, source_sel=None, dest_sel=None, var=None,
+                  epsilon=None):
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+    if epsilon:
+        np.add(dest[dest_sel], epsilon, out=dest[dest_sel])
     np.log10(dest[dest_sel], out=dest[dest_sel])
+
+
+# Template for log10(abs(x) + epsilon)
+def abs_log10_epsilon(datafile, dest, source_sel=None, dest_sel=None, var=None,
+                      epsilon=None):
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+    np.abs(dest[dest_sel], out=dest[dest_sel])
+    if epsilon:
+        np.add(dest[dest_sel], epsilon, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+
+# Track variables
+pt_log = partial(
+    log10_epsilon, var="TauTracks/pt")
+
+d0_abs_log = partial(
+    abs_log10_epsilon,  var="TauTracks/d0", epsilon=1e-6)
+
+z0sinThetaTJVA_abs_log = partial(
+    abs_log10_epsilon, var="TauTracks/z0sinThetaTJVA", epsilon=1e-6)
 
 
 def pt_asym(datafile, dest, source_sel=None, dest_sel=None):
@@ -23,53 +47,49 @@ def pt_asym(datafile, dest, source_sel=None, dest_sel=None):
     dest[dest_sel] = (pt_track - pt_jetseed) / (pt_track + pt_jetseed)
 
 
-def d0_abs_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauTracks/d0"].read_direct(dest, source_sel=source_sel,
-                                         dest_sel=dest_sel)
-    np.abs(dest[dest_sel], out=dest[dest_sel])
-    np.add(dest[dest_sel], 1e-6, out=dest[dest_sel])
-    np.log10(dest[dest_sel], out=dest[dest_sel])
+# Cluster variables
+et_log = partial(
+    log10_epsilon,xvar="TauClusters/et")
+
+SECOND_R_log = partial(
+    log10_epsilon, xvar="TauClusters/SECOND_R", epsilon=0.1)
+
+SECOND_LAMBDA_log = partial(
+    log10_epsilon, var="TauClusters/SECOND_LAMBDA", epsilon=0.1)
+
+FIRST_ENG_DENS_log = partial(
+    log10_epsilon, var="TauClusters/FIRST_ENG_DENS", epsilon=1e-6)
+
+CENTER_LAMBDA_log = partial(
+    log10_epsilon, var="TauClusters/CENTER_LAMBDA", epsilon=1e-6)
+
+# Common ID variables
+etOverPtLeadTrk_log = partial(
+    log10_epsilon, var="TauJets/etOverPtLeadTrk", epsilon=1e-6)
+
+absipSigLeadTrk_log = partial(
+    log10_epsilon, var="TauJets/absipSigLeadTrk", epsilon=1e-6)
+
+ptRatioEflowApprox_log = partial(
+    log10_epsilon, var="TauJets/ptRatioEflowApprox", epsilon=1e-6)
+
+mEflowAprox_log = partial(
+    log10_epsilon, var="TauJets/mEflowApprox", epsilon=1e-6)
+
+ptIntermediateAxis_log = partial(
+    log10_epsilon, var="TauJets/ptIntermediateAxis")
+
+mEflowApprox_log = partial(
+    log10_epsilon, var="TauJets/mEflowApprox", epsilon=1e-6)
+
+massTrkSys_log = partial(
+    log10_epsilon, var="TauJets/massTrkSys", epsilon=1e-6)
 
 
-def z0sinThetaTJVA_abs_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauTracks/z0sinThetaTJVA"].read_direct(dest, source_sel=source_sel,
-                                                     dest_sel=dest_sel)
-    np.abs(dest[dest_sel], out=dest[dest_sel])
-    np.add(dest[dest_sel], 1e-6, out=dest[dest_sel])
-    np.log10(dest[dest_sel], out=dest[dest_sel])
-
-
-def et_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauClusters/et"].read_direct(dest, source_sel=source_sel,
-                                           dest_sel=dest_sel)
-    np.log10(dest[dest_sel], out=dest[dest_sel])
-
-
-def SECOND_R_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauClusters/SECOND_R"].read_direct(dest, source_sel=source_sel,
-                                                 dest_sel=dest_sel)
-    np.add(dest[dest_sel], 0.1, out=dest[dest_sel])
-    np.log10(dest[dest_sel], out=dest[dest_sel])
-
-
-def SECOND_LAMBDA_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauClusters/SECOND_LAMBDA"].read_direct(dest, source_sel=source_sel,
-                                                      dest_sel=dest_sel)
-    np.add(dest[dest_sel], 0.1, out=dest[dest_sel])
-    np.log10(dest[dest_sel], out=dest[dest_sel])
-
-
-def FIRST_ENG_DENS_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauClusters/FIRST_ENG_DENS"].read_direct(dest, source_sel=source_sel,
-                                                       dest_sel=dest_sel)
-    np.add(dest[dest_sel], 1e-6, out=dest[dest_sel])
-    np.log10(dest[dest_sel], out=dest[dest_sel])
-
-
-def CENTER_LAMBDA_log(datafile, dest, source_sel=None, dest_sel=None):
-    datafile["TauClusters/CENTER_LAMBDA"].read_direct(dest, source_sel=source_sel,
-                                                      dest_sel=dest_sel)
-    np.add(dest[dest_sel], 1e-6, out=dest[dest_sel])
+def EMPOverTrkSysP_clip_log(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/EMPOverTrkSysP"].read_direct(dest, source_sel=source_sel,
+                                                   dest_sel=dest_sel)
+    np.clip(dest[dest_sel], 1e-3, np.inf, out=dest[dest_sel])
     np.log10(dest[dest_sel], out=dest[dest_sel])
 
 
@@ -98,4 +118,29 @@ cluster_vars = [
     ("TauClusters/FIRST_ENG_DENS", FIRST_ENG_DENS_log, scale),
     ("TauClusters/CENTER_LAMBDA", CENTER_LAMBDA_log, scale),
     ("TauClusters/ENG_FRAC_MAX", None, None)
+]
+
+id1p_vars = [
+    ("TauJets/centFrac", None, scale_flat),
+    ("TauJets/innerTrkAvgDist", None, scale_flat),
+    ("TauJets/SumPtTrkFrac", None, scale_flat),
+    ("TauJets/etOverPtLeadTrk", etOverPtLeadTrk_log, scale_flat),
+    ("TauJets/absipSigLeadTrk", absipSigLeadTrk_log, scale_flat),
+    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_clip_log, scale_flat),
+    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_log, scale_flat),
+    ("TauJets/mEflowApprox", mEflowApprox_log, scale_flat),
+    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_log, scale_flat)
+]
+
+id3p_vars = [
+    ("TauJets/centFrac", None, scale_flat),
+    ("TauJets/innerTrkAvgDist", None, scale_flat),
+    ("TauJets/SumPtTrkFrac", None, scale_flat),
+    ("TauJets/trFlightPathSig", None, scale_flat),
+    ("TauJets/dRmax", None, scale_flat),
+    ("TauJets/massTrkSys", massTrkSys_log, scale_flat),
+    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_clip_log, scale_flat),
+    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_log, scale_flat),
+    ("TauJets/mEflowApprox", mEflowApprox_log, scale_flat),
+    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_log, scale_flat)
 ]

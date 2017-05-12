@@ -13,6 +13,18 @@ def scale(arr, mean=True, std=True):
     return offset, scale
 
 
+def scale_flat(arr, mean=True, std=True):
+    offset = np.float32(0)
+    scale = np.float32(1)
+
+    if mean:
+        offset = np.mean(arr)
+    if std:
+        scale = np.std(arr)
+
+    return offset, scale
+
+
 def robust_scale(arr, median=True, interquartile=True,
                  low_perc=25.0, high_perc=75.0):
     offset = np.zeros(arr.shape[1], dtype=np.float32)

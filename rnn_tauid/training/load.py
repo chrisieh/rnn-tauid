@@ -29,10 +29,18 @@ def load_data(sig, bkg, sig_slice, bkg_slice, invars, num=None):
 
     # Load variables
     n_vars = len(invars)
-    x = np.empty((sig_len + bkg_len, num, n_vars))
 
-    sig_src = np.s_[sig_slice, :num]
-    bkg_src = np.s_[bkg_slice, :num]
+    # If number of timesteps given
+    if num:
+        x = np.empty((sig_len + bkg_len, num, n_vars))
+
+        sig_src = np.s_[sig_slice, :num]
+        bkg_src = np.s_[bkg_slice, :num]
+    else:
+        x = np.empty((sig_len + bkg_len, n_vars))
+
+        sig_src = np.s_[sig_slice]
+        bkg_src = np.s_[bkg_slice]
 
     for i, (varname, func, _) in enumerate(invars):
         sig_dest = np.s_[:sig_len, ..., i]
@@ -60,16 +68,28 @@ def parallel_shuffle(sequences):
 
 
 def train_test_split(data, test_size=0.2):
+    if not isinstance(data, list):
+        data = [data]
+
+    assert len(data) >= 1
+
     train_size = 1.0 - test_size
-    test_start, test_stop = int(train_size * len(data.y)), len(data.y)
+    test_start, test_stop = int(train_size * len(data[0].y)), len(data[0].y)
 
     train = slice(0, test_start)
     test = slice(test_start, test_stop)
 
-    parallel_shuffle([data.x, data.y, data.w])
+    arr = []
+    for d in data:
+        arr.extend([d.x, d.y, d.w])
 
-    return Data(x=data.x[train], y=data.y[train], w=data.w[train]), \
-           Data(x=data.x[test], y=data.y[test], w=data.w[test])
+    parallel_shuffle(arr)
+
+    ret = []
+    for d in data:
+        ret.extend([Data(x=d.x[train], y=d.y[train], w=d.w[train]),
+                    Data(x=d.x[test], y=d.y[test], w=d.w[test])])
+    return ret
 
 
 def preprocess(train, test, funcs):
