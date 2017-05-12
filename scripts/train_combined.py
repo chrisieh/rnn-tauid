@@ -6,9 +6,8 @@ import h5py
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 
 from rnn_tauid.models.combined import combined_rnn_ffnn
-from rnn_tauid.training.load import load_data, load_data_ffnn, \
-                                    train_test_split, preprocess, \
-                                    save_preprocessing
+from rnn_tauid.training.load import load_data, train_test_split,\
+                                    preprocess, save_preprocessing
 
 
 def main(args):
