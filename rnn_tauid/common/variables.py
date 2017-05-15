@@ -49,10 +49,10 @@ def pt_asym(datafile, dest, source_sel=None, dest_sel=None):
 
 # Cluster variables
 et_log = partial(
-    log10_epsilon,xvar="TauClusters/et")
+    log10_epsilon, var="TauClusters/et")
 
 SECOND_R_log = partial(
-    log10_epsilon, xvar="TauClusters/SECOND_R", epsilon=0.1)
+    log10_epsilon, var="TauClusters/SECOND_R", epsilon=0.1)
 
 SECOND_LAMBDA_log = partial(
     log10_epsilon, var="TauClusters/SECOND_LAMBDA", epsilon=0.1)
