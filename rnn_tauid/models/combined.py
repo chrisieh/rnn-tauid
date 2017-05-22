@@ -10,7 +10,6 @@ def combined_rnn_ffnn(
         backwards_1=False, mask_value=0.0, unroll=True):
     """
     Network with two parallel branches
-    TODO: Have auxilliary output
 
     Parameters:
     -----------
@@ -73,6 +72,39 @@ def combined_rnn_ffnn_aux_loss(
     return Model(input=[x_1, x_2], output=[y, aux_out])
 
 
+def combined_rnn_ffnn_two_output_layers(
+        input_shape_1, input_shape_2,
+        dense_units_1=32, lstm_units_1=32,
+        dense_units_2_1=128, dense_units_2_2=128,
+        dense_units_3_1=32,
+        backwards_1=False, mask_value=0.0, unroll=True):
+    """
+    Network with two parallel branches
+
+    Parameters:
+    -----------
+    """
+    # Branch 1
+    x_1 = Input(shape=input_shape_1)
+    mask_1 = Masking(mask_value=mask_value)(x_1)
+    shared_dense_1 = TimeDistributed(
+        Dense(dense_units_1, activation="tanh"))(mask_1)
+    lstm_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
+                  go_backwards=backwards_1)(shared_dense_1)
+
+    # Branch 2
+    x_2 = Input(shape=input_shape_2)
+    dense_2_1 = Dense(dense_units_2_1, activation="relu")(x_2)
+    dense_2_2 = Dense(dense_units_2_2, activation="relu")(dense_2_1)
+
+    # Merge
+    merged_branches = merge([lstm_1, dense_2_2], mode="concat")
+    dense_3_1 = Dense(dense_units_3_1, activation="relu")(merged_branches)
+    y = Dense(1, activation="sigmoid")(dense_3_1)
+
+    return Model(input=[x_1, x_2], output=y)
+
+
 def combined_2rnn_ffnn(
         input_shape_1, input_shape_2, input_shape_3,
         dense_units_1=32, lstm_units_1=32,
@@ -81,7 +113,6 @@ def combined_2rnn_ffnn(
         backwards=False, mask_value=0.0, unroll=True):
     """
     Network with two parallel branches
-    TODO: Have auxilliary output
 
     Parameters:
     -----------

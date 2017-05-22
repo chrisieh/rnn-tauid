@@ -58,7 +58,7 @@ def pt_reweight(sig_pt, bkg_pt):
     # Binning
     bin_edges = np.percentile(bkg_pt, np.linspace(0.0, 100.0, 50))
     bin_edges[0] = 20000.0  # 20 GeV lower limit
-    bin_edges[-1] = 4000000.0  # 4000 GeV upper limit
+    bin_edges[-1] = 10000000.0  # 10000 GeV upper limit
 
     # Reweighting coefficient
     sig_hist, _ = np.histogram(sig_pt, bins=bin_edges, density=True)

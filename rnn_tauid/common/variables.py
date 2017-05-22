@@ -47,6 +47,11 @@ def pt_asym(datafile, dest, source_sel=None, dest_sel=None):
     dest[dest_sel] = (pt_track - pt_jetseed) / (pt_track + pt_jetseed)
 
 
+def pt_jetseed_log(datafile, dest, source_sel=None, dest_sel=None):
+    pt = datafile["TauJets/ptJetSeed"][source_sel[0]]
+    dest[dest_sel] = np.log10(pt[:, np.newaxis])
+
+
 # Cluster variables
 et_log = partial(
     log10_epsilon, var="TauClusters/et")
@@ -102,7 +107,7 @@ track_vars = [
     ("TauTracks/eProbabilityHT", None, None),
     ("TauTracks/nInnermostPixelHits", None, partial(constant_scale, scale=3)),
     ("TauTracks/nPixelHits", None, partial(constant_scale, scale=11)),
-    ("TauTracks/nSiHits", None, partial(constant_scale, scale=25))
+    ("TauTracks/nSCTHits", None, partial(constant_scale, scale=20))
 ]
 
 cluster_vars = [

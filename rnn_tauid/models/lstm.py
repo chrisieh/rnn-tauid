@@ -1,6 +1,6 @@
 from keras.models import Model
 from keras.layers import Input, Dense, LSTM, Masking, Dropout, \
-                         TimeDistributed, merge
+                         TimeDistributed, merge, Bidirectional
 from keras.layers.normalization import BatchNormalization
 
 
@@ -66,6 +66,69 @@ def lstm_shared_weights(input_shape, dense_units=8, lstm_units=64,
     lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(
         shared_dense)
     y = Dense(1, activation="sigmoid")(lstm)
+
+    return Model(input=x, output=y)
+
+
+def lstm_shared_weights_2(input_shape, dense_units=8, lstm_units=64,
+                          dense_units_final=32, backwards=False,
+                          mask_value=0.0, unroll=True):
+    """
+    Recurrent neural network with shared weights at input and a single LSTM
+    layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units : int
+        Number of units of the dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
+    lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(
+        shared_dense)
+    dense = Dense(dense_units_final, activation="tanh")(lstm)
+    y = Dense(1, activation="sigmoid")(dense)
+
+    return Model(input=x, output=y)
+
+
+def lstm_bidirectional(input_shape, dense_units=8, lstm_units=64,
+                       backwards=False, mask_value=0.0, unroll=True):
+    """
+    Recurrent neural network with shared weights at input and a single LSTM
+    layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units : int
+        Number of units of the dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
+    bidirectional_lstm = Bidirectional(
+        LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards))(
+            shared_dense)
+    y = Dense(1, activation="sigmoid")(bidirectional_lstm)
 
     return Model(input=x, output=y)
 
@@ -152,7 +215,7 @@ def lstm_two_branches(input_shape_1, input_shape_2,
 def lstm_batch_norm(input_shape, dense_units=8, lstm_units=64,
                     backwards=False, mask_value=0.0, unroll=True):
     """
-    Recurrent neural network with shared weights at input, batch normalization 
+    Recurrent neural network with shared weights at input, batch normalization
     and a single LSTM layer
 
     Parameters:

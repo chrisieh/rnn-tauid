@@ -121,7 +121,7 @@ def binned_rejection(eff):
     RejectionResult = namedtuple("RejectionResult",
                                  ["mean", "std", "bin_edges"])
 
-    return RejectionResult(mean=mean, std=std, bin_edges=bin_edges.copy())
+    return RejectionResult(mean=mean, std=std, bin_edges=eff.bin_edges.copy())
 
 
 def pearsonr(x, y, weights=None):
