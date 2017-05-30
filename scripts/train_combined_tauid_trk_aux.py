@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 
-from rnn_tauid.models.combined import combined_rnn_ffnn
+from rnn_tauid.models.combined import combined_rnn_ffnn_aux_loss
 from rnn_tauid.training.load import load_data, train_test_split,\
                                     preprocess, save_preprocessing
 
@@ -80,22 +80,16 @@ def main(args):
     shape_rnn = rnn_train.x.shape[1:]
     shape_ffnn = ffnn_train.x.shape[1:]
 
-    from rnn_tauid.models.combined import combined_rnn_ffnn_two_output_layers
-
-    model = combined_rnn_ffnn_two_output_layers(
+    model = combined_rnn_ffnn_aux_loss(
         shape_rnn, shape_ffnn,
         dense_units_1=32, lstm_units_1=32,
-        dense_units_2_1=128, dense_units_2_2=128,
-        dense_units_3_1=32)
-    
-    # model = combined_rnn_ffnn(
-    #     shape_rnn, shape_ffnn,
-    #     dense_units_1=32, lstm_units_1=32,
-    #     dense_units_2_1=128, dense_units_2_2=128, dense_units_2_3=16)
+        dense_units_2_1=128, dense_units_2_2=128, dense_units_2_3=16)
 
     model.summary()
-    model.compile(loss="binary_crossentropy", optimizer="adam",
-              metrics=["accuracy"])
+    model.compile(optimizer="adam",
+                  loss="binary_crossentropy",
+                  loss_weights=[1.0, 1.0],
+                  metrics=["accuracy"])
 
     # Configure callbacks
     callbacks = []
@@ -114,8 +108,12 @@ def main(args):
 
     # Start training
     hist = model.fit(
-        [rnn_train.x, ffnn_train.x], rnn_train.y, sample_weight=rnn_train.w,
-        validation_data=([rnn_test.x, ffnn_test.x], rnn_test.y, rnn_test.w),
+        [rnn_train.x, ffnn_train.x],
+        [rnn_train.y, rnn_train.y],
+        sample_weight=[rnn_train.w, rnn_train.w],
+        validation_data=([rnn_test.x, ffnn_test.x],
+                         [rnn_test.y, rnn_test.y],
+                         [rnn_test.w, rnn_test.w]),
         nb_epoch=args.epochs, batch_size=args.batch_size,
         callbacks=callbacks, verbose=1)
 
@@ -136,7 +134,7 @@ if __name__ == "__main__":
     parser.add_argument("--fraction", type=float, default=0.2)
     parser.add_argument("--num-tracks", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=256)
-    parser.add_argument("--patience", type=int, default=10)
+    parser.add_argument("--patience", type=int, default=5)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--test-size", type=float, default=0.2)
     parser.add_argument("--dense-units", type=int, default=32)

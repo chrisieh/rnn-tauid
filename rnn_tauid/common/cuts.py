@@ -16,7 +16,9 @@ vetoCrackTruth = "abs(TauJets.truthEtaVis) < 1.37 " \
                  "|| abs(TauJets.truthEtaVis) > 1.52"
 matched = "TauJets.IsTruthMatched"
 mode1P = "TauJets.nTracks == 1"
+mode1PTruth = "TauJets.truthProng == 1"
 mode3P = "TauJets.nTracks == 3"
+mode3PTruth = "TauJets.truthProng == 3"
 
 matchKin = and_cuts([matched, eta25Truth, vetoCrackTruth, pt20Truth])
 baseline = and_cuts([eta25, vetoCrack, pt20, matchKin])
@@ -37,6 +39,20 @@ baselineNoTruthUpgrade = and_cuts([eta40, pt20])
 sel_truth_Xp = baselineUpgrade
 sel_Xp = baselineNoTruthUpgrade
 
+# PFOs
+ptLess100 = "TauJets.pt < 100000"
+ptLess100Truth = "TauJets.truthPtVis < 100000"
+noExtendedDecayMode = "TauJets.truthDecayMode < 5"
+
+sel_truth_1p_pfo = and_cuts([baseline, mode1P3PWithTruth, mode1P,
+                             ptLess100, ptLess100Truth])
+sel_truth_3p_pfo = and_cuts([baseline, mode1P3PWithTruth, mode3P,
+                             ptLess100, ptLess100Truth])
+sel_truth_Xp_pfo = and_cuts([baseline, ptLess100, ptLess100Truth,
+                             noExtendedDecayMode])
+
 sel_dict = {"truth1p": sel_truth_1p, "1p": sel_1p,
             "truth3p": sel_truth_3p, "3p": sel_3p,
-            "truthXp": sel_truth_Xp, "Xp": sel_Xp}
+            "truthXp": sel_truth_Xp, "Xp": sel_Xp,
+            "PFO1P": sel_truth_1p_pfo, "PFO3P": sel_truth_3p_pfo,
+            "PFOXP": sel_truth_Xp_pfo}

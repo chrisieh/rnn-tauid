@@ -129,3 +129,33 @@ def save_preprocessing(filename, variables, preprocessing):
         for var, (offset, scale) in zip(variables, preprocessing):
             f[var + "/offset"] = offset
             f[var + "/scale"] = scale
+
+
+def load_data_pfo(data, data_slice, invars, num=None):
+    # Class labels
+    decaymode = data["TauJets/truthDecayMode"][data_slice]
+    data_len = len(decaymode)
+    w = np.ones(data_len, dtype=np.float32)
+
+    y = (decaymode[:, np.newaxis] == np.unique(decaymode)).astype(np.float32)
+
+    # Load variables
+    n_vars = len(invars)
+
+    # If number of timesteps given
+    if num:
+        x = np.empty((data_len, num, n_vars))
+        data_src = np.s_[data_slice, :num]
+    else:
+        x = np.empty((data_len, n_vars))
+        data_src = np.s_[data_slice]
+
+    for i, (varname, func, _) in enumerate(invars):
+        data_dest = np.s_[:data_len, ..., i]
+
+        if func:
+            func(data, x, source_sel=data_src, dest_sel=data_dest)
+        else:
+            data[varname].read_direct(x, source_sel=data_src, dest_sel=data_dest)
+
+    return Data(x=x, y=y, w=w)
