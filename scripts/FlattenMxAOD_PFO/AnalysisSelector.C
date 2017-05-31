@@ -68,16 +68,12 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
     b_nVtxPU = fOutTree->Branch(
         "TauJets.nVtxPU", &v_nVtxPU, "TauJets.nVtxPU/I");
 
+    b_PanTau_DecayModeProto = fOutTree->Branch(
+        "TauJets.PanTau_DecayModeProto", &v_PanTau_DecayModeProto, "TauJets.PanTau_DecayModeProto/I");
     b_PanTau_DecayMode = fOutTree->Branch(
         "TauJets.PanTau_DecayMode", &v_PanTau_DecayMode, "TauJets.PanTau_DecayMode/I");
-    b_jet_Px = fOutTree->Branch(
-        "TauJets.Px", &v_jet_Px, "TauJets.Px/F");
-    b_jet_Py = fOutTree->Branch(
-        "TauJets.Py", &v_jet_Py, "TauJets.Py/F");
-    b_jet_Pz = fOutTree->Branch(
-        "TauJets.Pz", &v_jet_Pz, "TauJets.Pz/F");
-    b_jet_E = fOutTree->Branch(
-        "TauJets.E", &v_jet_E, "TauJets.E/F");
+    b_jet_Pt = fOutTree->Branch(
+        "TauJets.Pt", &v_jet_Pt, "TauJets.Pt/F");
     b_jet_Phi = fOutTree->Branch(
         "TauJets.Phi", &v_jet_Phi, "TauJets.Phi/F");
     b_jet_Eta = fOutTree->Branch(
@@ -86,38 +82,96 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
         "TauJets.nChargedPFOs", &v_jet_nChargedPFOs, "TauJets.nChargedPFOs/b");
     b_jet_nNeutralPFOs = fOutTree->Branch(
         "TauJets.nNeutralPFOs", &v_jet_nNeutralPFOs, "TauJets.nNeutralPFOs/b");
+    b_jet_nShotPFOs = fOutTree->Branch(
+        "TauJets.nShotPFOs", &v_jet_nShotPFOs, "TauJets.nShotPFOs/b");
+    b_jet_nHadronicPFOs = fOutTree->Branch(
+        "TauJets.nHadronicPFOs", &v_jet_nHadronicPFOs, "TauJets.nHadronicPFOs/b");
+    b_jet_nConversion = fOutTree->Branch(
+        "TauJets.nConversion", &v_jet_nConversion, "TauJets.nConversion/b");
 
     // PFOs
-    b_pfo_chargedPx = fOutTree->Branch(
-        "TauPFOs.chargedPx", &v_pfo_chargedPx);
-    b_pfo_chargedPy = fOutTree->Branch(
-        "TauPFOs.chargedPy", &v_pfo_chargedPy);
-    b_pfo_chargedPz = fOutTree->Branch(
-        "TauPFOs.chargedPz", &v_pfo_chargedPz);
-    b_pfo_chargedE = fOutTree->Branch(
-        "TauPFOs.chargedE", &v_pfo_chargedE);
+    b_pfo_chargedPt = fOutTree->Branch(
+        "TauPFOs.chargedPt", &v_pfo_chargedPt);
     b_pfo_chargedPhi = fOutTree->Branch(
         "TauPFOs.chargedPhi", &v_pfo_chargedPhi);
     b_pfo_chargedEta = fOutTree->Branch(
         "TauPFOs.chargedEta", &v_pfo_chargedEta);
 
-    b_pfo_neutralPx = fOutTree->Branch(
-        "TauPFOs.neutralPx", &v_pfo_neutralPx);
-    b_pfo_neutralPy = fOutTree->Branch(
-        "TauPFOs.neutralPy", &v_pfo_neutralPy);
-    b_pfo_neutralPz = fOutTree->Branch(
-        "TauPFOs.neutralPz", &v_pfo_neutralPz);
-    b_pfo_neutralE = fOutTree->Branch(
-        "TauPFOs.neutralE", &v_pfo_neutralE);
+    b_pfo_neutralPt = fOutTree->Branch(
+        "TauPFOs.neutralPt", &v_pfo_neutralPt);
     b_pfo_neutralPhi = fOutTree->Branch(
         "TauPFOs.neutralPhi", &v_pfo_neutralPhi);
     b_pfo_neutralEta = fOutTree->Branch(
         "TauPFOs.neutralEta", &v_pfo_neutralEta);
-
     b_pfo_neutralPi0BDT = fOutTree->Branch(
         "TauPFOs.neutralPi0BDT", &v_pfo_neutralPi0BDT);
     b_pfo_neutralNHitsInEM1 = fOutTree->Branch(
         "TauPFOs.neutralNHitsInEM1", &v_pfo_neutralNHitsInEM1);
+
+    b_pfo_neutralPtSub = fOutTree->Branch(
+        "TauPFOs.neutralPtSub", &v_pfo_neutralPtSub);
+    b_pfo_neutral_SECOND_R = fOutTree->Branch(
+        "TauPFOs.neutral_SECOND_R", &v_pfo_neutral_SECOND_R);
+    b_pfo_neutral_SECOND_LAMBDA = fOutTree->Branch(
+        "TauPFOs.neutral_SECOND_LAMBDA", &v_pfo_neutral_SECOND_LAMBDA);
+    b_pfo_neutral_CENTER_LAMBDA = fOutTree->Branch(
+        "TauPFOs.neutral_CENTER_LAMBDA", &v_pfo_neutral_CENTER_LAMBDA);
+    b_pfo_neutral_ENG_FRAC_MAX = fOutTree->Branch(
+        "TauPFOs.neutral_ENG_FRAC_MAX", &v_pfo_neutral_ENG_FRAC_MAX);
+    b_pfo_neutral_ENG_FRAC_CORE = fOutTree->Branch(
+        "TauPFOs.neutral_ENG_FRAC_CORE", &v_pfo_neutral_ENG_FRAC_CORE);
+    b_pfo_neutral_SECOND_ENG_DENS = fOutTree->Branch(
+        "TauPFOs.neutral_SECOND_ENG_DENS", &v_pfo_neutral_SECOND_ENG_DENS);
+    b_pfo_neutral_NPosECells_EM1 = fOutTree->Branch(
+        "TauPFOs.neutral_NPosECells_EM1", &v_pfo_neutral_NPosECells_EM1);
+    b_pfo_neutral_NPosECells_EM2 = fOutTree->Branch(
+        "TauPFOs.neutral_NPosECells_EM2", &v_pfo_neutral_NPosECells_EM2);
+    b_pfo_neutral_secondEtaWRTClusterPosition_EM1 = fOutTree->Branch(
+        "TauPFOs.neutral_secondEtaWRTClusterPosition_EM1",
+        &v_pfo_neutral_secondEtaWRTClusterPosition_EM1);
+    b_pfo_neutral_secondEtaWRTClusterPosition_EM2 = fOutTree->Branch(
+        "TauPFOs.neutral_secondEtaWRTClusterPosition_EM2",
+        &v_pfo_neutral_secondEtaWRTClusterPosition_EM2);
+    b_pfo_neutral_energyfrac_EM1 = fOutTree->Branch(
+        "TauPFOs.neutral_energyfrac_EM1", &v_pfo_neutral_energyfrac_EM1);
+    b_pfo_neutral_energyfrac_EM2 = fOutTree->Branch(
+        "TauPFOs.neutral_energyfrac_EM2", &v_pfo_neutral_energyfrac_EM2);
+
+    b_pfo_neutralPt_BDTSort = fOutTree->Branch(
+        "TauPFOs.neutralPt_BDTSort", &v_pfo_neutralPt_BDTSort);
+    b_pfo_neutralPhi_BDTSort = fOutTree->Branch(
+        "TauPFOs.neutralPhi_BDTSort", &v_pfo_neutralPhi_BDTSort);
+    b_pfo_neutralEta_BDTSort = fOutTree->Branch(
+        "TauPFOs.neutralEta_BDTSort", &v_pfo_neutralEta_BDTSort);
+    b_pfo_neutralPi0BDT_BDTSort = fOutTree->Branch(
+        "TauPFOs.neutralPi0BDT_BDTSort", &v_pfo_neutralPi0BDT_BDTSort);
+    b_pfo_neutralNHitsInEM1_BDTSort = fOutTree->Branch(
+        "TauPFOs.neutralNHitsInEM1_BDTSort", &v_pfo_neutralNHitsInEM1_BDTSort);
+
+    b_pfo_shotPt = fOutTree->Branch(
+        "TauPFOs.shotPt", &v_pfo_shotPt);
+    b_pfo_shotPhi = fOutTree->Branch(
+        "TauPFOs.shotPhi", &v_pfo_shotPhi);
+    b_pfo_shotEta = fOutTree->Branch(
+        "TauPFOs.shotEta", &v_pfo_shotEta);
+
+    b_pfo_hadronicPt = fOutTree->Branch(
+        "TauPFOs.hadronicPt", &v_pfo_hadronicPt);
+    b_pfo_hadronicPhi = fOutTree->Branch(
+        "TauPFOs.hadronicPhi", &v_pfo_hadronicPhi);
+    b_pfo_hadronicEta = fOutTree->Branch(
+        "TauPFOs.hadronicEta", &v_pfo_hadronicEta);
+
+    b_conv_pt = fOutTree->Branch(
+        "TauConv.pt", &v_conv_pt);
+    b_conv_phi = fOutTree->Branch(
+        "TauConv.phi", &v_conv_phi);
+    b_conv_eta = fOutTree->Branch(
+        "TauConv.eta", &v_conv_eta);
+    b_conv_phi_extrap = fOutTree->Branch(
+        "TauConv.phi_extrap", &v_conv_phi_extrap);
+    b_conv_eta_extrap = fOutTree->Branch(
+        "TauConv.eta_extrap", &v_conv_eta_extrap);
 }
 
 void AnalysisSelector::SlaveBegin(TTree * /*tree*/)
@@ -151,29 +205,50 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
 
     for (size_t itau = 0; itau < reader_pt.GetSize(); itau++)
     {
-        //std::cout << "pt: " << reader_pt[itau] << std::endl;
-        // auto nTracks = reader_nTracks[itau];
-        // if (nTracks != 1 && nTracks != 3)
-        // {
-        //     continue;
-        // }
-
         // Clear PFO vectors
-        v_pfo_chargedPx.clear();
-        v_pfo_chargedPy.clear();
-        v_pfo_chargedPz.clear();
-        v_pfo_chargedE.clear();
+        v_pfo_chargedPt.clear();
         v_pfo_chargedPhi.clear();
         v_pfo_chargedEta.clear();
 
-        v_pfo_neutralPx.clear();
-        v_pfo_neutralPy.clear();
-        v_pfo_neutralPz.clear();
-        v_pfo_neutralE.clear();
+        v_pfo_neutralPt.clear();
         v_pfo_neutralPhi.clear();
         v_pfo_neutralEta.clear();
         v_pfo_neutralPi0BDT.clear();
         v_pfo_neutralNHitsInEM1.clear();
+
+        v_pfo_neutralPtSub.clear();
+        v_pfo_neutral_SECOND_R.clear();
+        v_pfo_neutral_SECOND_LAMBDA.clear();
+        v_pfo_neutral_CENTER_LAMBDA.clear();
+        v_pfo_neutral_ENG_FRAC_MAX.clear();
+        v_pfo_neutral_ENG_FRAC_CORE.clear();
+        v_pfo_neutral_SECOND_ENG_DENS.clear();
+        v_pfo_neutral_NPosECells_EM1.clear();
+        v_pfo_neutral_NPosECells_EM2.clear();
+        v_pfo_neutral_secondEtaWRTClusterPosition_EM1.clear();
+        v_pfo_neutral_secondEtaWRTClusterPosition_EM2.clear();
+        v_pfo_neutral_energyfrac_EM1.clear();
+        v_pfo_neutral_energyfrac_EM2.clear();
+
+        v_pfo_neutralPt_BDTSort.clear();
+        v_pfo_neutralPhi_BDTSort.clear();
+        v_pfo_neutralEta_BDTSort.clear();
+        v_pfo_neutralPi0BDT_BDTSort.clear();
+        v_pfo_neutralNHitsInEM1_BDTSort.clear();
+
+        v_pfo_shotPt.clear();
+        v_pfo_shotPhi.clear();
+        v_pfo_shotEta.clear();
+
+        v_pfo_hadronicPt.clear();
+        v_pfo_hadronicPhi.clear();
+        v_pfo_hadronicEta.clear();
+
+        v_conv_pt.clear();
+        v_conv_phi.clear();
+        v_conv_eta.clear();
+        v_conv_phi_extrap.clear();
+        v_conv_eta_extrap.clear();
 
         // set tau properties for branches
         if (deco_truth)
@@ -192,39 +267,109 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_nTracks = reader_nTracks[itau];
         v_mu = reader_mu[itau];
         v_nVtxPU = reader_nVtxPU[itau];
+        v_PanTau_DecayModeProto = reader_PanTau_DecayModeProto[itau];
         v_PanTau_DecayMode = reader_PanTau_DecayMode[itau];
 
-        v_jet_Px = reader_jet_Px[itau];
-        v_jet_Py = reader_jet_Py[itau];
-        v_jet_Pz = reader_jet_Pz[itau];
-        v_jet_E = reader_jet_E[itau];
+        v_jet_Pt = reader_jet_Pt[itau];
         v_jet_Phi = reader_jet_Phi[itau];
         v_jet_Eta = reader_jet_Eta[itau];
         v_jet_nChargedPFOs = reader_jet_nChargedPFOs[itau];
         v_jet_nNeutralPFOs = reader_jet_nNeutralPFOs[itau];
+        v_jet_nShotPFOs = reader_jet_nShotPFOs[itau];
+        v_jet_nHadronicPFOs = reader_jet_nHadronicPFOs[itau];
+        v_jet_nConversion = reader_jet_nConversion[itau];
 
         // Charged PFOs
-        for (size_t iPFO = 0; iPFO < reader_pfo_chargedPx[itau].size(); iPFO++)
+        for (size_t iPFO = 0; iPFO < reader_pfo_chargedPt[itau].size(); iPFO++)
         {
-            v_pfo_chargedPx.push_back(reader_pfo_chargedPx[itau][iPFO]);
-            v_pfo_chargedPy.push_back(reader_pfo_chargedPy[itau][iPFO]);
-            v_pfo_chargedPz.push_back(reader_pfo_chargedPz[itau][iPFO]);
-            v_pfo_chargedE.push_back(reader_pfo_chargedE[itau][iPFO]);
+            v_pfo_chargedPt.push_back(reader_pfo_chargedPt[itau][iPFO]);
             v_pfo_chargedPhi.push_back(reader_pfo_chargedPhi[itau][iPFO]);
             v_pfo_chargedEta.push_back(reader_pfo_chargedEta[itau][iPFO]);
         }
 
         // Neutral PFOs
-        for (size_t iPFO = 0; iPFO < reader_pfo_neutralPx[itau].size(); iPFO++)
+        for (size_t iPFO = 0; iPFO < reader_pfo_neutralPt[itau].size(); iPFO++)
         {
-            v_pfo_neutralPx.push_back(reader_pfo_neutralPx[itau][iPFO]);
-            v_pfo_neutralPy.push_back(reader_pfo_neutralPy[itau][iPFO]);
-            v_pfo_neutralPz.push_back(reader_pfo_neutralPz[itau][iPFO]);
-            v_pfo_neutralE.push_back(reader_pfo_neutralE[itau][iPFO]);
+            v_pfo_neutralPt.push_back(reader_pfo_neutralPt[itau][iPFO]);
             v_pfo_neutralPhi.push_back(reader_pfo_neutralPhi[itau][iPFO]);
             v_pfo_neutralEta.push_back(reader_pfo_neutralEta[itau][iPFO]);
             v_pfo_neutralPi0BDT.push_back(reader_pfo_neutralPi0BDT[itau][iPFO]);
             v_pfo_neutralNHitsInEM1.push_back(reader_pfo_neutralNHitsInEM1[itau][iPFO]);
+
+            v_pfo_neutralPtSub.push_back(
+                reader_pfo_neutralPtSub[itau][iPFO]);
+            v_pfo_neutral_SECOND_R.push_back(
+                reader_pfo_neutral_SECOND_R[itau][iPFO]);
+            v_pfo_neutral_SECOND_LAMBDA.push_back(
+                reader_pfo_neutral_SECOND_LAMBDA[itau][iPFO]);
+            v_pfo_neutral_CENTER_LAMBDA.push_back(
+                reader_pfo_neutral_CENTER_LAMBDA[itau][iPFO]);
+            v_pfo_neutral_ENG_FRAC_MAX.push_back(
+                reader_pfo_neutral_ENG_FRAC_MAX[itau][iPFO]);
+            v_pfo_neutral_ENG_FRAC_CORE.push_back(
+                reader_pfo_neutral_ENG_FRAC_CORE[itau][iPFO]);
+            v_pfo_neutral_SECOND_ENG_DENS.push_back(
+                reader_pfo_neutral_SECOND_ENG_DENS[itau][iPFO]);
+            v_pfo_neutral_NPosECells_EM1.push_back(
+                reader_pfo_neutral_NPosECells_EM1[itau][iPFO]);
+            v_pfo_neutral_NPosECells_EM2.push_back(
+                reader_pfo_neutral_NPosECells_EM2[itau][iPFO]);
+            v_pfo_neutral_secondEtaWRTClusterPosition_EM1.push_back(
+                reader_pfo_neutral_secondEtaWRTClusterPosition_EM1[itau][iPFO]);
+            v_pfo_neutral_secondEtaWRTClusterPosition_EM2.push_back(
+                reader_pfo_neutral_secondEtaWRTClusterPosition_EM2[itau][iPFO]);
+            v_pfo_neutral_energyfrac_EM1.push_back(
+                reader_pfo_neutral_energyfrac_EM1[itau][iPFO]);
+            v_pfo_neutral_energyfrac_EM2.push_back(
+                reader_pfo_neutral_energyfrac_EM2[itau][iPFO]);
+        }
+
+        // Neutral PFOs (BDTSort)
+        for (size_t iPFO = 0; iPFO < reader_pfo_neutralPt_BDTSort[itau].size(); iPFO++) {
+            v_pfo_neutralPt_BDTSort.push_back(
+                reader_pfo_neutralPt_BDTSort[itau][iPFO]);
+            v_pfo_neutralPhi_BDTSort.push_back(
+                reader_pfo_neutralPhi_BDTSort[itau][iPFO]);
+            v_pfo_neutralEta_BDTSort.push_back(
+                reader_pfo_neutralEta_BDTSort[itau][iPFO]);
+            v_pfo_neutralPi0BDT_BDTSort.push_back(
+                reader_pfo_neutralPi0BDT_BDTSort[itau][iPFO]);
+            v_pfo_neutralNHitsInEM1_BDTSort.push_back(
+                reader_pfo_neutralNHitsInEM1_BDTSort[itau][iPFO]);
+        }
+
+        // Shots
+        for (size_t iPFO = 0; iPFO < reader_pfo_shotPt[itau].size(); iPFO++) {
+            v_pfo_shotPt.push_back(
+                reader_pfo_shotPt[itau][iPFO]);
+            v_pfo_shotPhi.push_back(
+                reader_pfo_shotPhi[itau][iPFO]);
+            v_pfo_shotEta.push_back(
+                reader_pfo_shotEta[itau][iPFO]);
+        }
+
+        // Hadronic PFOs
+        for (size_t iPFO = 0; iPFO < reader_pfo_hadronicPt[itau].size(); iPFO++) {
+            v_pfo_hadronicPt.push_back(
+                reader_pfo_hadronicPt[itau][iPFO]);
+            v_pfo_hadronicPhi.push_back(
+                reader_pfo_hadronicPhi[itau][iPFO]);
+            v_pfo_hadronicEta.push_back(
+                reader_pfo_hadronicEta[itau][iPFO]);
+        }
+
+        // Conversion tracks
+        for (size_t iTrack = 0; iTrack < reader_conv_pt[itau].size(); iTrack++) {
+            v_conv_pt.push_back(
+                reader_conv_pt[itau][iTrack]);
+            v_conv_phi.push_back(
+                reader_conv_phi[itau][iTrack]);
+            v_conv_eta.push_back(
+                reader_conv_eta[itau][iTrack]);
+            v_conv_phi_extrap.push_back(
+                reader_conv_phi_extrap[itau][iTrack]);
+            v_conv_eta_extrap.push_back(
+                reader_conv_eta_extrap[itau][iTrack]);
         }
 
         fOutTree->Fill();

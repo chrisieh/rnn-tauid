@@ -26,13 +26,15 @@ class AnalysisSelector : public TSelector
 
     // Readers to access the data (delete the ones you do not need).
     using vfloat = vector<float>;
+    using vint = vector<int>;
     using vuint8 = vector<uint8_t>;
     using TRA_int = TTreeReaderArray<int>;
     using TRA_uint8 = TTreeReaderArray<uint8_t>;
     using TRA_float = TTreeReaderArray<float>;
     using TRA_double = TTreeReaderArray<double>;
     using TRA_vfloat = TTreeReaderArray<vfloat>;
-    using TRA_vuint8 = TTreeReaderArray<vector<uint8_t>>;
+    using TRA_vint = TTreeReaderArray<vint>;
+    using TRA_vuint8 = TTreeReaderArray<vuint8>;
 
     // Truth variables
     TTreeReaderArray<unsigned long> *reader_truthProng = 0;
@@ -50,34 +52,79 @@ class AnalysisSelector : public TSelector
     // TauJets variables
     TRA_double reader_mu = {fReader, "TauJetsAuxDyn.mu"};
     TRA_int reader_nVtxPU = {fReader, "TauJetsAuxDyn.nVtxPU"};
+    TRA_int reader_PanTau_DecayModeProto = {fReader, "TauJetsAuxDyn.PanTau_DecayModeProto"};
     TRA_int reader_PanTau_DecayMode = {fReader, "TauJetsAuxDyn.PanTau_DecayMode"};
-    TRA_float reader_jet_Px = {fReader, "TauJetsAuxDyn.jet_Px"};
-    TRA_float reader_jet_Py = {fReader, "TauJetsAuxDyn.jet_Py"};
-    TRA_float reader_jet_Pz = {fReader, "TauJetsAuxDyn.jet_Pz"};
-    TRA_float reader_jet_E = {fReader, "TauJetsAuxDyn.jet_E"};
+    TRA_float reader_jet_Pt = {fReader, "TauJetsAuxDyn.jet_Pt"};
     TRA_float reader_jet_Phi = {fReader, "TauJetsAuxDyn.jet_Phi"};
     TRA_float reader_jet_Eta = {fReader, "TauJetsAuxDyn.jet_Eta"};
     TRA_uint8 reader_jet_nChargedPFOs = {fReader, "TauJetsAuxDyn.jet_nChargedPFOs"};
     TRA_uint8 reader_jet_nNeutralPFOs = {fReader, "TauJetsAuxDyn.jet_nNeutralPFOs"};
+    TRA_uint8 reader_jet_nShotPFOs = {fReader, "TauJetsAuxDyn.jet_nShotPFOs"};
+    TRA_uint8 reader_jet_nHadronicPFOs = {fReader, "TauJetsAuxDyn.jet_nHadronicPFOs"};
+    TRA_uint8 reader_jet_nConversion = {fReader, "TauJetsAuxDyn.jet_nConversion"};
 
     // PFO variables
-    TRA_vfloat reader_pfo_chargedPx = {fReader, "TauJetsAuxDyn.pfo_chargedPx"};
-    TRA_vfloat reader_pfo_chargedPy = {fReader, "TauJetsAuxDyn.pfo_chargedPy"};
-    TRA_vfloat reader_pfo_chargedPz = {fReader, "TauJetsAuxDyn.pfo_chargedPz"};
-    TRA_vfloat reader_pfo_chargedE = {fReader, "TauJetsAuxDyn.pfo_chargedE"};
+    TRA_vfloat reader_pfo_chargedPt = {fReader, "TauJetsAuxDyn.pfo_chargedPt"};
     TRA_vfloat reader_pfo_chargedPhi = {fReader, "TauJetsAuxDyn.pfo_chargedPhi"};
     TRA_vfloat reader_pfo_chargedEta = {fReader, "TauJetsAuxDyn.pfo_chargedEta"};
 
-    TRA_vfloat reader_pfo_neutralPx = {fReader, "TauJetsAuxDyn.pfo_neutralPx"};
-    TRA_vfloat reader_pfo_neutralPy = {fReader, "TauJetsAuxDyn.pfo_neutralPy"};
-    TRA_vfloat reader_pfo_neutralPz = {fReader, "TauJetsAuxDyn.pfo_neutralPz"};
-    TRA_vfloat reader_pfo_neutralE = {fReader, "TauJetsAuxDyn.pfo_neutralE"};
+    TRA_vfloat reader_pfo_neutralPt = {fReader, "TauJetsAuxDyn.pfo_neutralPt"};
     TRA_vfloat reader_pfo_neutralPhi = {fReader, "TauJetsAuxDyn.pfo_neutralPhi"};
     TRA_vfloat reader_pfo_neutralEta = {fReader, "TauJetsAuxDyn.pfo_neutralEta"};
-
     TRA_vfloat reader_pfo_neutralPi0BDT = {fReader, "TauJetsAuxDyn.pfo_neutralPi0BDT"};
     TRA_vuint8 reader_pfo_neutralNHitsInEM1 = {fReader, "TauJetsAuxDyn.pfo_neutralNHitsInEM1"};
 
+    TRA_vfloat reader_pfo_neutralPtSub =
+        {fReader, "TauJetsAuxDyn.pfo_neutralPtSub"};
+    TRA_vfloat reader_pfo_neutral_SECOND_R =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_SECOND_R"};
+    TRA_vfloat reader_pfo_neutral_SECOND_LAMBDA =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_SECOND_LAMBDA"};
+    TRA_vfloat reader_pfo_neutral_CENTER_LAMBDA =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_CENTER_LAMBDA"};
+    TRA_vfloat reader_pfo_neutral_ENG_FRAC_MAX =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_ENG_FRAC_MAX"};
+    TRA_vfloat reader_pfo_neutral_ENG_FRAC_CORE =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_ENG_FRAC_CORE"};
+    TRA_vfloat reader_pfo_neutral_SECOND_ENG_DENS =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_SECOND_ENG_DENS"};
+    TRA_vint reader_pfo_neutral_NPosECells_EM1 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_NPosECells_EM1"};
+    TRA_vint reader_pfo_neutral_NPosECells_EM2 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_NPosECells_EM2"};
+    TRA_vfloat reader_pfo_neutral_secondEtaWRTClusterPosition_EM1 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_secondEtaWRTClusterPosition_EM1"};
+    TRA_vfloat reader_pfo_neutral_secondEtaWRTClusterPosition_EM2 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_secondEtaWRTClusterPosition_EM2"};
+    TRA_vfloat reader_pfo_neutral_energyfrac_EM1 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_energyfrac_EM1"};
+    TRA_vfloat reader_pfo_neutral_energyfrac_EM2 =
+        {fReader, "TauJetsAuxDyn.pfo_neutral_energyfrac_EM2"};
+
+    TRA_vfloat reader_pfo_neutralPt_BDTSort =
+        {fReader, "TauJetsAuxDyn.pfo_neutralPt_BDTSort"};
+    TRA_vfloat reader_pfo_neutralPhi_BDTSort =
+        {fReader, "TauJetsAuxDyn.pfo_neutralPhi_BDTSort"};
+    TRA_vfloat reader_pfo_neutralEta_BDTSort =
+        {fReader, "TauJetsAuxDyn.pfo_neutralEta_BDTSort"};
+    TRA_vfloat reader_pfo_neutralPi0BDT_BDTSort =
+        {fReader, "TauJetsAuxDyn.pfo_neutralPi0BDT_BDTSort"};
+    TRA_vuint8 reader_pfo_neutralNHitsInEM1_BDTSort =
+        {fReader, "TauJetsAuxDyn.pfo_neutralNHitsInEM1_BDTSort"};
+
+    TRA_vfloat reader_pfo_shotPt = {fReader, "TauJetsAuxDyn.pfo_shotPt"};
+    TRA_vfloat reader_pfo_shotPhi = {fReader, "TauJetsAuxDyn.pfo_shotPhi"};
+    TRA_vfloat reader_pfo_shotEta = {fReader, "TauJetsAuxDyn.pfo_shotEta"};
+
+    TRA_vfloat reader_pfo_hadronicPt = {fReader, "TauJetsAuxDyn.pfo_hadronicPt"};
+    TRA_vfloat reader_pfo_hadronicPhi = {fReader, "TauJetsAuxDyn.pfo_hadronicPhi"};
+    TRA_vfloat reader_pfo_hadronicEta = {fReader, "TauJetsAuxDyn.pfo_hadronicEta"};
+
+    TRA_vfloat reader_conv_pt = {fReader, "TauJetsAuxDyn.conv_pt"};
+    TRA_vfloat reader_conv_phi = {fReader, "TauJetsAuxDyn.conv_phi"};
+    TRA_vfloat reader_conv_eta = {fReader, "TauJetsAuxDyn.conv_eta"};
+    TRA_vfloat reader_conv_phi_extrap = {fReader, "TauJetsAuxDyn.conv_phi_extrap"};
+    TRA_vfloat reader_conv_eta_extrap = {fReader, "TauJetsAuxDyn.conv_eta_extrap"};
 
     // Truth variables
     unsigned long v_truthProng;
@@ -93,32 +140,61 @@ class AnalysisSelector : public TSelector
     float v_phi;
     double v_mu;
     int v_nVtxPU;
+    int v_PanTau_DecayModeProto;
     int v_PanTau_DecayMode;
-    float v_jet_Px;
-    float v_jet_Py;
-    float v_jet_Pz;
-    float v_jet_E;
+    float v_jet_Pt;
     float v_jet_Phi;
     float v_jet_Eta;
     uint8_t v_jet_nChargedPFOs;
     uint8_t v_jet_nNeutralPFOs;
+    uint8_t v_jet_nShotPFOs;
+    uint8_t v_jet_nHadronicPFOs;
+    uint8_t v_jet_nConversion;
 
     // PFO variables
-    vfloat v_pfo_chargedPx;
-    vfloat v_pfo_chargedPy;
-    vfloat v_pfo_chargedPz;
-    vfloat v_pfo_chargedE;
+    vfloat v_pfo_chargedPt;
     vfloat v_pfo_chargedPhi;
     vfloat v_pfo_chargedEta;
 
-    vfloat v_pfo_neutralPx;
-    vfloat v_pfo_neutralPy;
-    vfloat v_pfo_neutralPz;
-    vfloat v_pfo_neutralE;
+    vfloat v_pfo_neutralPt;
     vfloat v_pfo_neutralPhi;
     vfloat v_pfo_neutralEta;
     vfloat v_pfo_neutralPi0BDT;
     vuint8 v_pfo_neutralNHitsInEM1;
+
+    vfloat v_pfo_neutralPtSub;
+    vfloat v_pfo_neutral_SECOND_R;
+    vfloat v_pfo_neutral_SECOND_LAMBDA;
+    vfloat v_pfo_neutral_CENTER_LAMBDA;
+    vfloat v_pfo_neutral_ENG_FRAC_MAX;
+    vfloat v_pfo_neutral_ENG_FRAC_CORE;
+    vfloat v_pfo_neutral_SECOND_ENG_DENS;
+    vint v_pfo_neutral_NPosECells_EM1;
+    vint v_pfo_neutral_NPosECells_EM2;
+    vfloat v_pfo_neutral_secondEtaWRTClusterPosition_EM1;
+    vfloat v_pfo_neutral_secondEtaWRTClusterPosition_EM2;
+    vfloat v_pfo_neutral_energyfrac_EM1;
+    vfloat v_pfo_neutral_energyfrac_EM2;
+
+    vfloat v_pfo_neutralPt_BDTSort;
+    vfloat v_pfo_neutralPhi_BDTSort;
+    vfloat v_pfo_neutralEta_BDTSort;
+    vfloat v_pfo_neutralPi0BDT_BDTSort;
+    vuint8 v_pfo_neutralNHitsInEM1_BDTSort;
+
+    vfloat v_pfo_shotPt;
+    vfloat v_pfo_shotPhi;
+    vfloat v_pfo_shotEta;
+
+    vfloat v_pfo_hadronicPt;
+    vfloat v_pfo_hadronicPhi;
+    vfloat v_pfo_hadronicEta;
+
+    vfloat v_conv_pt;
+    vfloat v_conv_phi;
+    vfloat v_conv_eta;
+    vfloat v_conv_phi_extrap;
+    vfloat v_conv_eta_extrap;
 
     // output branches
     // Truth branches
@@ -135,32 +211,61 @@ class AnalysisSelector : public TSelector
     TBranch *b_nTracks = 0;
     TBranch *b_mu = 0;
     TBranch *b_nVtxPU = 0;
+    TBranch *b_PanTau_DecayModeProto = 0;
     TBranch *b_PanTau_DecayMode = 0;
-    TBranch *b_jet_Px = 0;
-    TBranch *b_jet_Py = 0;
-    TBranch *b_jet_Pz = 0;
-    TBranch *b_jet_E = 0;
+    TBranch *b_jet_Pt = 0;
     TBranch *b_jet_Phi = 0;
     TBranch *b_jet_Eta = 0;
     TBranch *b_jet_nChargedPFOs = 0;
     TBranch *b_jet_nNeutralPFOs = 0;
+    TBranch *b_jet_nShotPFOs = 0;
+    TBranch *b_jet_nHadronicPFOs = 0;
+    TBranch *b_jet_nConversion = 0;
 
     // PFO branches
-    TBranch *b_pfo_chargedPx = 0;
-    TBranch *b_pfo_chargedPy = 0;
-    TBranch *b_pfo_chargedPz = 0;
-    TBranch *b_pfo_chargedE = 0;
+    TBranch *b_pfo_chargedPt = 0;
     TBranch *b_pfo_chargedPhi = 0;
     TBranch *b_pfo_chargedEta = 0;
 
-    TBranch *b_pfo_neutralPx = 0;
-    TBranch *b_pfo_neutralPy = 0;
-    TBranch *b_pfo_neutralPz = 0;
-    TBranch *b_pfo_neutralE = 0;
+    TBranch *b_pfo_neutralPt = 0;
     TBranch *b_pfo_neutralPhi = 0;
     TBranch *b_pfo_neutralEta = 0;
     TBranch *b_pfo_neutralPi0BDT = 0;
     TBranch *b_pfo_neutralNHitsInEM1 = 0;
+
+    TBranch *b_pfo_neutralPtSub = 0;
+    TBranch *b_pfo_neutral_SECOND_R = 0;
+    TBranch *b_pfo_neutral_SECOND_LAMBDA = 0;
+    TBranch *b_pfo_neutral_CENTER_LAMBDA = 0;
+    TBranch *b_pfo_neutral_ENG_FRAC_MAX = 0;
+    TBranch *b_pfo_neutral_ENG_FRAC_CORE = 0;
+    TBranch *b_pfo_neutral_SECOND_ENG_DENS = 0;
+    TBranch *b_pfo_neutral_NPosECells_EM1 = 0;
+    TBranch *b_pfo_neutral_NPosECells_EM2 = 0;
+    TBranch *b_pfo_neutral_secondEtaWRTClusterPosition_EM1 = 0;
+    TBranch *b_pfo_neutral_secondEtaWRTClusterPosition_EM2 = 0;
+    TBranch *b_pfo_neutral_energyfrac_EM1 = 0;
+    TBranch *b_pfo_neutral_energyfrac_EM2 = 0;
+
+    TBranch *b_pfo_neutralPt_BDTSort = 0;
+    TBranch *b_pfo_neutralPhi_BDTSort = 0;
+    TBranch *b_pfo_neutralEta_BDTSort = 0;
+    TBranch *b_pfo_neutralPi0BDT_BDTSort = 0;
+    TBranch *b_pfo_neutralNHitsInEM1_BDTSort = 0;
+
+    TBranch *b_pfo_shotPt = 0;
+    TBranch *b_pfo_shotPhi = 0;
+    TBranch *b_pfo_shotEta = 0;
+
+    TBranch *b_pfo_hadronicPt = 0;
+    TBranch *b_pfo_hadronicPhi = 0;
+    TBranch *b_pfo_hadronicEta = 0;
+
+    TBranch *b_conv_pt = 0;
+    TBranch *b_conv_phi = 0;
+    TBranch *b_conv_eta = 0;
+    TBranch *b_conv_phi_extrap = 0;
+    TBranch *b_conv_eta_extrap = 0;
 
     AnalysisSelector(TTree * /*tree*/ = 0){ fout_name = "temp.root"; }
     AnalysisSelector(std::string fout, bool truth) {
