@@ -12,14 +12,19 @@ mpl_setup()
 import matplotlib.pyplot as plt
 
 
-def migration_matrix(truth, reco):
+def migration_matrix(truth, reco, comp=False):
     assert len(truth) == len(reco)
     diag_eff = np.count_nonzero(truth == reco) / float(len(truth))
 
     cm = confusion_matrix(truth, reco).T[::-1]
 
     # Normalize columns
-    cm_norm = 100 * np.true_divide(cm, np.sum(cm, axis=0, keepdims=True))
+    if comp:
+        axis = 1
+    else:
+        axis = 0
+
+    cm_norm = 100 * np.true_divide(cm, np.sum(cm, axis=axis, keepdims=True))
 
     return diag_eff, cm_norm
 
@@ -64,7 +69,9 @@ def main(args):
     print("Eff. 3p0n: {}".format(eff_3p0n))
     print("Eff. 3pXn: {}".format(eff_3pXn))
 
-    diag_eff, cm = migration_matrix(truth[pass_margin], reco[pass_margin])
+    diag_eff, cm = migration_matrix(truth[pass_margin],
+                                    reco[pass_margin],
+                                    comp=args.composition)
 
     np.set_printoptions(suppress=True)
     print(cm)
@@ -111,6 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("deco")
     parser.add_argument("out")
     parser.add_argument("--margin", type=float, default=0.1)
+    parser.add_argument("--composition", action="store_true")
 
     args = parser.parse_args()
     main(args)
