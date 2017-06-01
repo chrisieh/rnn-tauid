@@ -99,19 +99,18 @@ def EMPOverTrkSysP_clip_log(datafile, dest, source_sel=None, dest_sel=None):
 
 
 # PFO variables
-def Eta(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
+def Eta(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedEta"):
     # Hack to set nans
-    datafile["TauPFOs/{}Px".format(pfo_type)].read_direct(dest, source_sel=source_sel,
-                                                          dest_sel=dest_sel)
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
 
     eta = datafile["TauJets/Eta"]
     np.add(dest[dest_sel], eta[source_sel[0]][:, np.newaxis], out=dest[dest_sel])
 
 
-def Phi(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
+def Phi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi"):
     # Hack to set nans
-    datafile["TauPFOs/{}Px".format(pfo_type)].read_direct(dest, source_sel=source_sel,
+    datafile[var].read_direct(dest, source_sel=source_sel,
                                                           dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
 
@@ -119,55 +118,57 @@ def Phi(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
     np.add(dest[dest_sel], phi[source_sel[0]][:, np.newaxis], out=dest[dest_sel])
 
 
-def dEta(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
+def dEta(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedEta"):
     eta_jet = datafile["TauJets/Eta"][source_sel[0]]
-    datafile["TauPFOs/{}Eta".format(pfo_type)].read_direct(dest, source_sel=source_sel,
-                                               dest_sel=dest_sel)
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.subtract(dest[dest_sel], eta_jet[:, np.newaxis], out=dest[dest_sel])
 
 
-def dPhi(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
+def dPhi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi"):
     phi_jet = datafile["TauJets/Phi"][source_sel[0]]
-    datafile["TauPFOs/{}Phi".format(pfo_type)].read_direct(dest, source_sel=source_sel,
-                                               dest_sel=dest_sel)
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.subtract(dest[dest_sel], phi_jet[:, np.newaxis], out=dest[dest_sel])
     np.add(dest[dest_sel], np.pi, out=dest[dest_sel])
     np.fmod(dest[dest_sel], 2 * np.pi, out=dest[dest_sel])
     np.subtract(dest[dest_sel], np.pi, out=dest[dest_sel])
 
-
-def Pt_log(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
-    px = datafile["TauPFOs/{}Px".format(pfo_type)]
-    py = datafile["TauPFOs/{}Py".format(pfo_type)]
-    dest[dest_sel] = np.log10(np.sqrt(px[source_sel]**2 + py[source_sel]**2))
-
-
-def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None, pfo_type="charged"):
+def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPt"):
     # Hack to set nans
-    datafile["TauPFOs/{}Px".format(pfo_type)].read_direct(dest, source_sel=source_sel,
-                                                          dest_sel=dest_sel)
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
+    pt = datafile["TauJets/Pt"]
 
-    px = datafile["TauJets/Px"]
-    py = datafile["TauJets/Py"]
     dest[dest_sel] = np.add(dest[dest_sel],
-                            np.log10(np.sqrt(px[source_sel[0]]**2 +
-                                             py[source_sel[0]]**2))[:, np.newaxis],
+                            np.log10(pt[source_sel[0]])[:, np.newaxis],
                             out=dest[dest_sel])
 
+# Charged & neutral PFOs
+charged_Eta = partial(Eta, var="TauPFOs/chargedEta")
+neutral_Eta = partial(Eta, var="TauPFOs/neutralEta")
+shot_Eta = partial(Eta, var="TauPFOs/shotEta")
+charged_Phi = partial(Phi, var="TauPFOs/chargedPhi")
+neutral_Phi = partial(Phi, var="TauPFOs/neutralPhi")
+shot_Phi = partial(Phi, var="TauPFOs/shotPhi")
+charged_dEta = partial(dEta, var="TauPFOs/chargedEta")
+neutral_dEta = partial(dEta, var="TauPFOs/neutralEta")
+shot_dEta = partial(dEta, var="TauPFOs/shotEta")
+charged_dPhi = partial(dPhi, var="TauPFOs/chargedPhi")
+neutral_dPhi = partial(dPhi, var="TauPFOs/neutralPhi")
+shot_dPhi = partial(dPhi, var="TauPFOs/shotPhi")
+charged_Pt_log = partial(log10_epsilon, var="TauPFOs/chargedPt")
+neutral_Pt_log = partial(log10_epsilon, var="TauPFOs/neutralPt")
+shot_Pt_log = partial(log10_epsilon, var="TauPFOs/shotPt")
+charged_Pt_jet_log = partial(Pt_jet_log, var="TauPFOs/chargedPt")
+neutral_Pt_jet_log = partial(Pt_jet_log, var="TauPFOs/neutralPt")
+shot_Pt_jet_log = partial(Pt_jet_log, var="TauPFOs/shotPt")
 
-charged_Eta = partial(Eta, pfo_type="charged")
-neutral_Eta = partial(Eta, pfo_type="neutral")
-charged_Phi = partial(Phi, pfo_type="charged")
-neutral_Phi = partial(Phi, pfo_type="neutral")
-charged_dEta = partial(dEta, pfo_type="charged")
-neutral_dEta = partial(dEta, pfo_type="neutral")
-charged_dPhi = partial(dPhi, pfo_type="charged")
-neutral_dPhi = partial(dPhi, pfo_type="neutral")
-charged_Pt_log = partial(Pt_log, pfo_type="charged")
-neutral_Pt_log = partial(Pt_log, pfo_type="neutral")
-charged_Pt_jet_log = partial(Pt_jet_log, pfo_type="charged")
-neutral_Pt_jet_log = partial(Pt_jet_log, pfo_type="neutral")
+# Conversion tracks
+conversion_Eta = partial(Eta, var="TauConv/eta")
+conversion_Phi = partial(Phi, var="TauConv/phi")
+conversion_dEta = partial(dEta, var="TauConv/eta")
+conversion_dPhi = partial(dPhi, var="TauConv/phi")
+conversion_Pt_log = partial(log10_epsilon, var="TauConv/pt")
+conversion_Pt_jet_log = partial(Pt_jet_log, var="TauConv/pt")
 
 
 track_vars = [
@@ -240,4 +241,22 @@ neutral_pfo_vars = [
     ("TauPFOs/neutral_Pt_log", neutral_Pt_log, scale),
     ("TauPFOs/neutralPi0BDT", None, None),
     ("TauPFOs/neutralNHitsInEM1", None, None)
+]
+
+conversion_vars = [
+    ("TauJets/conversion_Phi", conversion_Phi, partial(constant_scale, scale=np.pi)),
+    ("TauJets/conversion_Eta", conversion_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/conversion_Pt_jet_log", conversion_Pt_jet_log, scale),
+    ("TauConv/conversion_dPhi", conversion_dPhi, scale),
+    ("TauConv/conversion_dEta", conversion_dEta, scale),
+    ("TauConv/conversion_Pt_log", conversion_Pt_log, scale)
+]
+
+shot_vars = [
+    ("TauJets/shot_Phi", shot_Phi, partial(constant_scale, scale=np.pi)),
+    ("TauJets/shot_Eta", shot_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/shot_Pt_jet_log", shot_Pt_jet_log, scale),
+    ("TauPFOs/shot_dPhi", shot_dPhi, scale),
+    ("TauPFOs/shot_dEta", shot_dEta, scale),
+    ("TauPFOs/shot_Pt_log", shot_Pt_log, scale)
 ]

@@ -24,14 +24,14 @@ def main(args):
 
     # Load preprocessing rules
     with h5py.File(args.preprocessing_chrg, "r") as f:
-        pp_invars = np.char.decode(f["variables"][...]).tolist()
-        chrg_offset = {v: f[v + "/offset"][...] for v in pp_invars}
-        chrg_scale = {v: f[v + "/scale"][...] for v in pp_invars}
+        chrg_vars = np.char.decode(f["variables"][...]).tolist()
+        chrg_offset = {v: f[v + "/offset"][...] for v in chrg_vars}
+        chrg_scale = {v: f[v + "/scale"][...] for v in chrg_vars}
 
     with h5py.File(args.preprocessing_neut, "r") as f:
-        pp_invars = np.char.decode(f["variables"][...]).tolist()
-        neut_offset = {v: f[v + "/offset"][...] for v in pp_invars}
-        neut_scale = {v: f[v + "/scale"][...] for v in pp_invars}
+        neut_vars = np.char.decode(f["variables"][...]).tolist()
+        neut_offset = {v: f[v + "/offset"][...] for v in neut_vars}
+        neut_scale = {v: f[v + "/scale"][...] for v in neut_vars}
 
 
     # Load model
@@ -78,6 +78,13 @@ def main(args):
                 else:
                     data[varname].read_direct(x_neut, source_sel=src_neut, dest_sel=dest)
 
+                # Apply pt cut on neutral pfos
+                if args.neut_pt_cut:
+                    pt_col = neut_vars.index("TauPFOs/neutral_Pt_log")
+                    neut_pfo_pt = x_neut[:, :, pt_col]
+                    pt_fail = neut_pfo_pt < np.log10(1000 * args.neut_pt_cut)
+                    x_neut[pt_fail] = np.nan
+
                 x_neut[dest] -= neut_offset[varname]
                 x_neut[dest] /= neut_scale[varname]
 
@@ -101,6 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("preprocessing_neut")
     parser.add_argument("model")
     parser.add_argument("data")
+    parser.add_argument("--neut-pt-cut", type=float, default=0)
     parser.add_argument("--v-chrg", dest="chrg_var", default=None)
     parser.add_argument("--v-neut", dest="neut_var", default=None)
     parser.add_argument("-o", dest="outfile", default="pred.h5")
