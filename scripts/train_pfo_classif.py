@@ -27,7 +27,6 @@ def main(args):
     else:
         from rnn_tauid.common.variables import neutral_pfo_vars as invars_neut
 
-
     # Variable names
     chrg_vars = [v for v, _, _ in invars_chrg]
     neut_vars = [v for v, _, _ in invars_neut]
@@ -123,7 +122,7 @@ def main(args):
                      validation_data=([chrg_test.x, neut_test.x],
                                       chrg_test.y, chrg_test.w),
                      nb_epoch=args.epochs, batch_size=args.batch_size,
-                     callbacks=callbacks, verbose=1)
+                     callbacks=callbacks, verbose=2)
 
     # Determine best epoch & validation loss
     val_loss, epoch = min(zip(hist.history["val_loss"], hist.epoch))
