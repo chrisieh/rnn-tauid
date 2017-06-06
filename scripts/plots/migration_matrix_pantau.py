@@ -37,12 +37,24 @@ def main(args):
         truth = f["TauJets/truthDecayMode"][...]
         truth = truth[mask]
 
+        if args.pt:
+            pt = f["TauJets/pt"][...]
+            pt_low = 1000 * min(args.pt)
+            pt_high = 1000 * max(args.pt)
+            pt_sel = (pt_low < pt) & (pt < pt_high)
+            pt_sel = pt_sel[mask]
+
+            truth = truth[pt_sel]
+
         if args.proto:
             pantau = f["TauJets/PanTau_DecayModeProto"][...]
         else:
             pantau = f["TauJets/PanTau_DecayMode"][...]
 
         pantau = pantau[mask]
+
+        if args.pt:
+            pantau = pantau[pt_sel]
 
     diag_eff, cm = migration_matrix(truth, pantau, comp=args.composition)
 
@@ -82,8 +94,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("data")
     parser.add_argument("out")
-    parser.add_argument("--composition", action="store_true")
     parser.add_argument("--proto", action="store_true")
+    parser.add_argument("--composition", action="store_true")
+    parser.add_argument("--pt", nargs=2, type=float)
+
 
     args = parser.parse_args()
     main(args)
