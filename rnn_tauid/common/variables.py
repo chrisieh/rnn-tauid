@@ -132,15 +132,48 @@ def dPhi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi
     np.fmod(dest[dest_sel], 2 * np.pi, out=dest[dest_sel])
     np.subtract(dest[dest_sel], np.pi, out=dest[dest_sel])
 
+
 def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPt"):
     # Hack to set nans
     datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
     pt = datafile["TauJets/Pt"]
 
-    dest[dest_sel] = np.add(dest[dest_sel],
-                            np.log10(pt[source_sel[0]])[:, np.newaxis],
-                            out=dest[dest_sel])
+    np.add(dest[dest_sel], np.log10(pt[source_sel[0]])[:, np.newaxis],
+           out=dest[dest_sel])
+
+
+def PtSubRatio(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauPFOs/neutralPtSub"].read_direct(dest, source_sel=source_sel,
+                                                 dest_sel=dest_sel)
+    pt = datafile["TauPFOs/neutralPt"][source_sel]
+    np.add(pt, dest[dest_sel], out=pt)
+    np.divide(dest[dest_sel], pt, out=dest[dest_sel])
+
+# dPhi, dEta for extrapolated conversion tracks
+
+def dEta_extrap(datafile, dest, source_sel=None, dest_sel=None, var="TauConv/eta_extrap"):
+    eta_jet = datafile["TauJets/Eta"][source_sel[0]]
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+
+    # Set default value to nan
+    dest[dest_sel][dest[dest_sel] == -10.0] = np.nan
+
+    np.subtract(dest[dest_sel], eta_jet[:, np.newaxis], out=dest[dest_sel])
+
+
+def dPhi_extrap(datafile, dest, source_sel=None, dest_sel=None, var="TauConv/phi_extrap"):
+    phi_jet = datafile["TauJets/Phi"][source_sel[0]]
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+
+    # Set default value to nan
+    dest[dest_sel][dest[dest_sel] == -10.0] = np.nan
+
+    np.subtract(dest[dest_sel], phi_jet[:, np.newaxis], out=dest[dest_sel])
+    np.add(dest[dest_sel], np.pi, out=dest[dest_sel])
+    np.fmod(dest[dest_sel], 2 * np.pi, out=dest[dest_sel])
+    np.subtract(dest[dest_sel], np.pi, out=dest[dest_sel])
+
 
 # Charged & neutral PFOs
 charged_Eta = partial(Eta, var="TauPFOs/chargedEta")
@@ -179,11 +212,21 @@ shot_Pt_jet_log = partial(Pt_jet_log, var="TauPFOs/shotPt")
 hadronic_Pt_jet_log = partial(Pt_jet_log, var="TauPFOs/hadronicPt")
 neutral_Pt_jet_log_bdtsort = partial(Pt_jet_log, var="TauPFOs/neutralPt_BDTSort")
 
+# Moments
+neutral_SECOND_R_log = partial(log10_epsilon, var="TauPFOs/neutral_SECOND_R", epsilon=1)
+neutral_secondEtaWRTClusterPosition_EM1_log =partial(
+    log10_epsilon, var="TauPFOs/neutral_secondEtaWRTClusterPosition_EM1", epsilon=1e-6)
+
+
 # Conversion tracks
 conversion_Eta = partial(Eta, var="TauConv/eta")
 conversion_Phi = partial(Phi, var="TauConv/phi")
 conversion_dEta = partial(dEta, var="TauConv/eta")
 conversion_dPhi = partial(dPhi, var="TauConv/phi")
+
+conversion_dEta_extrapol = partial(dEta_extrap, var="TauConv/eta_extrap")
+conversion_dPhi_extrapol = partial(dPhi_extrap, var="TauConv/phi_extrap")
+
 conversion_Pt_log = partial(log10_epsilon, var="TauConv/pt")
 conversion_Pt_jet_log = partial(Pt_jet_log, var="TauConv/pt")
 
@@ -260,6 +303,22 @@ neutral_pfo_vars = [
     ("TauPFOs/neutralNHitsInEM1", None, None)
 ]
 
+neutral_pfo_w_moment_vars = [
+    ("TauJets/neutral_Phi", neutral_Phi, partial(constant_scale, scale=np.pi)),
+    ("TauJets/neutral_Eta", neutral_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/neutral_Pt_jet_log", neutral_Pt_jet_log, scale),
+    ("TauPFOs/neutral_dPhi", neutral_dPhi, scale),
+    ("TauPFOs/neutral_dEta", neutral_dEta, scale),
+    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, scale),
+    ("TauPFOs/neutralPi0BDT", None, None),
+    ("TauPFOs/neutralNHitsInEM1", None, None),
+    ("TauPFOs/neutral_SECOND_R", neutral_SECOND_R_log, scale),
+    ("TauPFOs/neutral_secondEtaWRTClusterPosition_EM1", neutral_secondEtaWRTClusterPosition_EM1_log, scale),
+    ("TauPFOs/neutral_NPosECells_EM1", None, scale),
+    ("TauPFOs/neutral_ENG_FRAC_CORE", None, None),
+    ("TauPFOs/neutral_energyfrac_EM2", None, None)
+]
+
 neutral_pfo_bdtsort_vars = [
     ("TauJets/neutral_Phi_BDTSort", neutral_Phi_bdtsort,
      partial(constant_scale, scale=np.pi)),
@@ -279,6 +338,15 @@ conversion_vars = [
     ("TauJets/conversion_Pt_jet_log", conversion_Pt_jet_log, scale),
     ("TauConv/conversion_dPhi", conversion_dPhi, scale),
     ("TauConv/conversion_dEta", conversion_dEta, scale),
+    ("TauConv/conversion_Pt_log", conversion_Pt_log, scale)
+]
+
+conversion_extrapol_vars = [
+    ("TauJets/conversion_Phi", conversion_Phi, partial(constant_scale, scale=np.pi)),
+    ("TauJets/conversion_Eta", conversion_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/conversion_Pt_jet_log", conversion_Pt_jet_log, scale),
+    ("TauConv/conversion_dPhi_extrap", dPhi_extrap, scale),
+    ("TauConv/conversion_dEta_extrap", dEta_extrap, scale),
     ("TauConv/conversion_Pt_log", conversion_Pt_log, scale)
 ]
 

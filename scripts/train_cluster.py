@@ -31,11 +31,29 @@ def main(args):
 
         sig_idx = int(args.fraction * lsig)
         bkg_idx = int(args.fraction * lbkg)
+        if args.cap:
+            sig_idx = min(sig_idx, args.cap)
+            bkg_idx = min(bkg_idx, args.cap)
 
         print("Loading sig [:{}] and bkg [:{}]".format(sig_idx, bkg_idx))
         data = load_data(sig, bkg, np.s_[:sig_idx], np.s_[:bkg_idx],
                          invars, args.num_clusters)
-        
+
+        if args.pt_thr:
+            pt = np.empty((sig_idx + bkg_idx,), dtype=np.float32)
+            pt[:sig_idx] = sig["TauJets/pt"][:sig_idx]
+            pt[sig_idx:] = bkg["TauJets/pt"][:bkg_idx]
+
+            pass_thr = pt > args.pt_thr * 1000.0
+            from collections import namedtuple
+            Data = namedtuple("Data", ["x", "y", "w"])
+            data_new = Data(x=data.x[pass_thr], y=data.y[pass_thr], w=data.w[pass_thr])
+
+            print("Sig pass pt thr: {}".format(np.count_nonzero(pass_thr[:sig_idx])))
+            print("Bkg pass pt thr: {}".format(np.count_nonzero(pass_thr[sig_idx:])))
+
+            data = data_new
+
     train, test = train_test_split(data, test_size=args.test_size)
     preprocessing = preprocess(train, test, f_preproc)
 
@@ -60,7 +78,7 @@ def main(args):
     early_stopping = EarlyStopping(
         monitor="val_loss", patience=args.patience, verbose=1)
     callbacks.append(early_stopping)
-    
+
     model_checkpoint = ModelCheckpoint(
         args.model, monitor="val_loss", save_best_only=True, verbose=1)
     callbacks.append(model_checkpoint)
@@ -87,7 +105,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--preprocessing", default="preproc.h5")
     parser.add_argument("--model", default="model.h5")
-    
+
     parser.add_argument("--fraction", type=float, default=0.2)
     parser.add_argument("--num-clusters", type=int, default=6)
     parser.add_argument("--batch-size", type=int, default=256)
@@ -98,6 +116,8 @@ if __name__ == "__main__":
     parser.add_argument("--lstm-units", type=int, default=24)
     parser.add_argument("--csv-log", default=None)
     parser.add_argument("--var-mod", default=None)
-    
+    parser.add_argument("--cap", type=int, default=None)
+    parser.add_argument("--pt-thr", type=float, default=None)
+
     args = parser.parse_args()
     main(args)

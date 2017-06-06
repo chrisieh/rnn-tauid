@@ -18,7 +18,7 @@ def get_args():
                                  "truth3p", "3p",
                                  "truthXp", "Xp",
                                  "PFO1P", "PFO3P",
-                                 "PFOXP"],
+                                 "PFOXP", "PFOXPHighPt"],
                         help="Selection to apply to the taus")
     parser.add_argument("infiles", nargs="+",
                         help="Input root files with flattened containers")
