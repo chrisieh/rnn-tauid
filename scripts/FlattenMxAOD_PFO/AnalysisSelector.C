@@ -88,6 +88,12 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
         "TauJets.nHadronicPFOs", &v_jet_nHadronicPFOs, "TauJets.nHadronicPFOs/b");
     b_jet_nConversion = fOutTree->Branch(
         "TauJets.nConversion", &v_jet_nConversion, "TauJets.nConversion/b");
+    b_BDTJetScore = fOutTree->Branch(
+        "TauJets.BDTJetScore", &v_BDTJetScore,
+        "TauJets.BDTJetScore/F");
+    b_BDTJetScoreSigTrans = fOutTree->Branch(
+        "TauJets.BDTJetScoreSigTrans", &v_BDTJetScoreSigTrans,
+        "TauJets.BDTJetScoreSigTrans/F");
 
     // PFOs
     b_pfo_chargedPt = fOutTree->Branch(
@@ -278,6 +284,8 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_jet_nShotPFOs = reader_jet_nShotPFOs[itau];
         v_jet_nHadronicPFOs = reader_jet_nHadronicPFOs[itau];
         v_jet_nConversion = reader_jet_nConversion[itau];
+        v_BDTJetScore = reader_BDTJetScore[itau];
+        v_BDTJetScoreSigTrans = reader_BDTJetScoreSigTrans[itau];
 
         // Charged PFOs
         for (size_t iPFO = 0; iPFO < reader_pfo_chargedPt[itau].size(); iPFO++)

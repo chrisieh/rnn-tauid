@@ -63,6 +63,9 @@ class AnalysisSelector : public TSelector
     TRA_uint8 reader_jet_nHadronicPFOs = {fReader, "TauJetsAuxDyn.jet_nHadronicPFOs"};
     TRA_uint8 reader_jet_nConversion = {fReader, "TauJetsAuxDyn.jet_nConversion"};
 
+    TRA_float reader_BDTJetScore = {fReader, "TauJetsAuxDyn.BDTJetScore"};
+    TRA_float reader_BDTJetScoreSigTrans = {fReader, "TauJetsAuxDyn.BDTJetScoreSigTrans"};
+
     // PFO variables
     TRA_vfloat reader_pfo_chargedPt = {fReader, "TauJetsAuxDyn.pfo_chargedPt"};
     TRA_vfloat reader_pfo_chargedPhi = {fReader, "TauJetsAuxDyn.pfo_chargedPhi"};
@@ -150,6 +153,8 @@ class AnalysisSelector : public TSelector
     uint8_t v_jet_nShotPFOs;
     uint8_t v_jet_nHadronicPFOs;
     uint8_t v_jet_nConversion;
+    float v_BDTJetScore;
+    float v_BDTJetScoreSigTrans;
 
     // PFO variables
     vfloat v_pfo_chargedPt;
@@ -221,6 +226,8 @@ class AnalysisSelector : public TSelector
     TBranch *b_jet_nShotPFOs = 0;
     TBranch *b_jet_nHadronicPFOs = 0;
     TBranch *b_jet_nConversion = 0;
+    TBranch *b_BDTJetScore = 0;
+    TBranch *b_BDTJetScoreSigTrans = 0;
 
     // PFO branches
     TBranch *b_pfo_chargedPt = 0;
