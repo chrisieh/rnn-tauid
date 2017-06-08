@@ -34,6 +34,12 @@ def main(args):
         nTracks = f["TauJets/nTracks"][...]
         mask = (nTracks == 1) | (nTracks == 3)
 
+        if args.tauid_medium:
+            bdtscore = f["TauJets/BDTJetScoreSigTrans"][...]
+            cut_1p = 1.0 - 0.75
+            cut_3p = 1.0 - 0.6
+            mask = ((nTracks == 1) & (bdtscore > cut_1p)) | ((nTracks == 3) & (bdtscore > cut_3p))
+
         truth = f["TauJets/truthDecayMode"][...]
         truth = truth[mask]
 
@@ -97,6 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--proto", action="store_true")
     parser.add_argument("--composition", action="store_true")
     parser.add_argument("--pt", nargs=2, type=float)
+    parser.add_argument("--tauid-medium", action="store_true", help="1P eff. 75%%, 3P eff. 60%%")
 
 
     args = parser.parse_args()
