@@ -27,7 +27,7 @@ def get_args():
 # Global config
 treename = "CollectionTree"
 default_value = 0
-n_tracks = 15
+n_tracks = 20
 n_clusters = 15
 
 
@@ -79,31 +79,31 @@ if __name__ == "__main__":
                                 dtype=np.float32, **h5opt)
 
         # Track
-        mask = root2array(args.infiles, treename=treename,
-                          branches=("TauTracks.pt", default_value, n_tracks),
-                          selection=sel)
-        mask = mask <= 0
+        # mask = root2array(args.infiles, treename=treename,
+        #                   branches=("TauTracks.pt", default_value, n_tracks),
+        #                   selection=sel)
+        # mask = mask <= 0
 
-        for br in tqdm(track_branches, desc="Tracks"):
-            data = root2array(args.infiles, treename=treename,
-                              branches=(br, default_value, n_tracks),
-                              selection=sel)
-            data = data.astype(np.float32)
+        # for br in tqdm(track_branches, desc="Tracks"):
+        #     data = root2array(args.infiles, treename=treename,
+        #                       branches=(br, default_value, n_tracks),
+        #                       selection=sel)
+        #     data = data.astype(np.float32)
 
-            # Set nan
-            data[mask] = np.nan
+        #     # Set nan
+        #     data[mask] = np.nan
 
-            # Check if same number of events and shuffle
-            if n_events:
-                assert n_events == len(data)
-            else:
-                n_events = len(data)
+        #     # Check if same number of events and shuffle
+        #     if n_events:
+        #         assert n_events == len(data)
+        #     else:
+        #         n_events = len(data)
 
-            random_state = np.random.RandomState(seed=seed)
-            random_state.shuffle(data)
+        #     random_state = np.random.RandomState(seed=seed)
+        #     random_state.shuffle(data)
 
-            outf.create_dataset("{}/{}".format(*br.split(".")),
-                                data=data, dtype=np.float32, **h5opt)
+        #     outf.create_dataset("{}/{}".format(*br.split(".")),
+        #                         data=data, dtype=np.float32, **h5opt)
 
         # Cluster
         mask = root2array(args.infiles, treename=treename,

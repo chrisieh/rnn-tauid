@@ -216,6 +216,8 @@ neutral_Pt_jet_log_bdtsort = partial(Pt_jet_log, var="TauPFOs/neutralPt_BDTSort"
 neutral_SECOND_R_log = partial(log10_epsilon, var="TauPFOs/neutral_SECOND_R", epsilon=1)
 neutral_secondEtaWRTClusterPosition_EM1_log =partial(
     log10_epsilon, var="TauPFOs/neutral_secondEtaWRTClusterPosition_EM1", epsilon=1e-6)
+neutral_SECOND_ENG_DENS_log = partial(log10_epsilon, var="TauPFOs/neutral_SECOND_ENG_DENS",
+                                      epsilon=1e-8)
 
 
 # Conversion tracks

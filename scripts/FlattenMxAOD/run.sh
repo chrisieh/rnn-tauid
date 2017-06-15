@@ -1,5 +1,5 @@
-INPUT_PREFIX=/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev/v06
-OUTPUT_PREFIX=/lustre/atlas/group/higgs/cdeutsch/rnn_samples_v4
+INPUT_PREFIX=/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev/v08
+OUTPUT_PREFIX=/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev_flat/v08
 
 python flat.py --truth $INPUT_PREFIX/*Gammatautau* $OUTPUT_PREFIX/Gammatautau
 python flat.py $INPUT_PREFIX/*DIJETS*JZ1W* $OUTPUT_PREFIX/JZ1W
