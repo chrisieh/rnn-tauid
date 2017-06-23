@@ -10,6 +10,7 @@ def main(args):
     if args.variables:
         import imp
         var_mod = imp.load_source("var_mod", args.variables)
+        invars = var_mod.invars
     else:
         from rnn_tauid.common.variables import track_vars as invars
 

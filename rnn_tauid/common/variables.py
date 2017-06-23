@@ -315,7 +315,8 @@ neutral_pfo_w_moment_vars = [
     ("TauPFOs/neutralPi0BDT", None, None),
     ("TauPFOs/neutralNHitsInEM1", None, None),
     ("TauPFOs/neutral_SECOND_R", neutral_SECOND_R_log, scale),
-    ("TauPFOs/neutral_secondEtaWRTClusterPosition_EM1", neutral_secondEtaWRTClusterPosition_EM1_log, scale),
+    ("TauPFOs/neutral_secondEtaWRTClusterPosition_EM1",
+     neutral_secondEtaWRTClusterPosition_EM1_log, scale),
     ("TauPFOs/neutral_NPosECells_EM1", None, scale),
     ("TauPFOs/neutral_ENG_FRAC_CORE", None, None),
     ("TauPFOs/neutral_energyfrac_EM2", None, None)

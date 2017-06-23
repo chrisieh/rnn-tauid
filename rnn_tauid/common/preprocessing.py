@@ -1,14 +1,20 @@
 import numpy as np
 
 
-def scale(arr, mean=True, std=True):
+def scale(arr, mean=True, std=True, per_obj=True):
     offset = np.zeros(arr.shape[1], dtype=np.float32)
     scale = np.ones(arr.shape[1], dtype=np.float32)
 
     if mean:
-        np.nanmean(arr, out=offset, axis=0)
+        if per_obj:
+            np.nanmean(arr, out=offset, axis=0)
+        else:
+            offset[:] = np.nanmean(arr)
     if std:
-        np.nanstd(arr, out=scale, axis=0)
+        if per_obj:
+            np.nanstd(arr, out=scale, axis=0)
+        else:
+            scale[:] = np.nanstd(arr)
 
     return offset, scale
 
@@ -43,6 +49,19 @@ def robust_scale(arr, median=True, interquartile=True,
 def max_scale(arr):
     offset = np.zeros(arr.shape[1], dtype=np.float32)
     scale = np.nanmax(arr, axis=0)
+
+    return offset, scale
+
+
+def min_max_scale(arr, per_obj=True):
+    if per_obj:
+        offset = np.nanmin(arr, axis=0)
+        scale = np.nanmax(arr, axis=0) - offset
+    else:
+        offset = np.nanmin(arr)
+        scale = np.nanmax(arr) - offset
+        offset = np.full(arr.shape[1], fill_value=offset, dtype=np.float32)
+        scale = np.full(arr.shape[1], fill_value=scale, dtype=np.float32)
 
     return offset, scale
 

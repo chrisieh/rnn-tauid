@@ -2,7 +2,8 @@ import matplotlib as mpl
 
 
 def mpl_setup(scale=0.49, aspect_ratio=8.0 / 6.0,
-              pad_left=0.16, pad_bottom=0.18):
+              pad_left=0.16, pad_bottom=0.18,
+              pad_right=0.95, pad_top=0.95):
     mpl.rcParams["font.sans-serif"] = ["Liberation Sans", "helvetica",
                                        "Helvetica", "Arial"]
     mpl.rcParams["font.family"] = "sans-serif"
@@ -19,8 +20,8 @@ def mpl_setup(scale=0.49, aspect_ratio=8.0 / 6.0,
 
     mpl.rcParams["figure.subplot.left"] = pad_left
     mpl.rcParams["figure.subplot.bottom"] = pad_bottom
-    mpl.rcParams["figure.subplot.top"] = 0.95
-    mpl.rcParams["figure.subplot.right"] = 0.95
+    mpl.rcParams["figure.subplot.top"] = pad_top
+    mpl.rcParams["figure.subplot.right"] = pad_right
 
     mpl.rcParams["axes.xmargin"] = 0.0
     mpl.rcParams["axes.ymargin"] = 0.0
