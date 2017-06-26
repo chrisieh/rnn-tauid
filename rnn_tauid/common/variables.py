@@ -24,15 +24,36 @@ def abs_log10_epsilon(datafile, dest, source_sel=None, dest_sel=None, var=None,
     np.log10(dest[dest_sel], out=dest[dest_sel])
 
 
+def abs_var(datafile, dest, source_sel=None, dest_sel=None, var=None):
+    datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+    np.abs(dest[dest_sel], out=dest[dest_sel])
+
+
 # Track variables
-pt_log = partial(
-    log10_epsilon, var="TauTracks/pt")
+pt_log = partial(log10_epsilon, var="TauTracks/pt")
 
-d0_abs_log = partial(
-    abs_log10_epsilon,  var="TauTracks/d0", epsilon=1e-6)
+d0_abs = partial(abs_var, var="TauTracks/d0")
 
-z0sinThetaTJVA_abs_log = partial(
-    abs_log10_epsilon, var="TauTracks/z0sinThetaTJVA", epsilon=1e-6)
+d0_abs_log = partial(abs_log10_epsilon,  var="TauTracks/d0", epsilon=1e-6)
+
+z0sinThetaTJVA_abs = partial(abs_var, var="TauTracks/z0sinThetaTJVA")
+
+z0sinThetaTJVA_abs_log = partial(abs_log10_epsilon,
+                                 var="TauTracks/z0sinThetaTJVA", epsilon=1e-6)
+
+rConv = partial(abs_var, var="TauTracks/rConvII")
+
+
+def pt_frac(datafile, dest, source_sel=None, dest_sel=None):
+    pt_track = datafile["TauTracks/pt"][source_sel]
+
+    datafile["TauTracks/pt"].read_direct(dest, source_sel=source_sel,
+                                         dest_sel=dest_sel)
+
+    pt_jetseed = datafile["TauJets/ptJetSeed"][source_sel[0]]
+    pt_jetseed = pt_jetseed[:, np.newaxis]
+
+    dest[dest_sel] = pt_track / pt_jetseed
 
 
 def pt_asym(datafile, dest, source_sel=None, dest_sel=None):

@@ -35,7 +35,26 @@ def main(args):
         print("Loading sig [:{}] and bkg [:{}]".format(sig_idx, bkg_idx))
         data = load_data(sig, bkg, np.s_[:sig_idx], np.s_[:bkg_idx],
                          invars, args.num_tracks)
-        
+
+        # Apply pt cut
+        if args.pt_cut:
+            from rnn_tauid.training.load import Data
+            pt_cut = float(args.pt_cut) * 1000
+            pt = np.concatenate([
+                sig["TauJets/pt"][:sig_idx],
+                bkg["TauJets/pt"][:bkg_idx]
+            ])
+            assert len(pt) == len(data.x)
+            pt_mask = pt < pt_cut
+
+            data_new = Data(
+                x=data.x[pt_mask],
+                y=data.y[pt_mask],
+                w=data.w[pt_mask]
+            )
+
+            data = data_new
+
     train, test = train_test_split(data, test_size=args.test_size)
     preprocessing = preprocess(train, test, f_preproc)
 
@@ -60,7 +79,7 @@ def main(args):
     early_stopping = EarlyStopping(
         monitor="val_loss", patience=args.patience, verbose=1)
     callbacks.append(early_stopping)
-    
+
     model_checkpoint = ModelCheckpoint(
         args.model, monitor="val_loss", save_best_only=True, verbose=1)
     callbacks.append(model_checkpoint)
@@ -87,7 +106,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--preprocessing", default="preproc.h5")
     parser.add_argument("--model", default="model.h5")
-    
+
     parser.add_argument("--fraction", type=float, default=0.2)
     parser.add_argument("--num-tracks", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=256)
@@ -98,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--lstm-units", type=int, default=32)
     parser.add_argument("--csv-log", default=None)
     parser.add_argument("--var-mod", default=None)
-    
+    parser.add_argument("--pt-cut", default=None)
+
     args = parser.parse_args()
     main(args)
