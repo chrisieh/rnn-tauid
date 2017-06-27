@@ -104,7 +104,8 @@ def main(args):
                                            r21["y_score"][~r21["is_sig"]])
     bkg_pass_thr = flat.passes_thr(bkg_pt, bkg_mu, bkg_y)
 
-    bins = 10 ** np.linspace(np.log10(20000), np.log10(300000), 11)
+    bins = 10 ** np.linspace(np.log10(20000), np.log10(args.pt_max * 1000.0),
+                             args.bins + 1)
     bin_midpoint = bin_center(bins)
     bin_half_width = bin_width(bins) / 2.0
 
@@ -128,9 +129,14 @@ def main(args):
     ax.errorbar(bin_midpoint / 1000.0, r21_bkg_rej,
                 xerr=bin_half_width / 1000.0, yerr=d_r21_bkg_rej,
                 fmt="o", label="R21 Tau-ID")
-    ax.set_xlim(20, 300)
+    ax.set_xlim(20, args.pt_max)
     ax.set_xlabel("pt / GeV", ha="right", x=1.0)
     ax.set_ylabel("Inverse background efficiency", ha="right", y=1.0)
+
+    if args.y_zero:
+        ylim = ax.get_ylim()
+        ax.set_ylim(0, ylim[1])
+
     ax.legend()
 
     fig.savefig(args.outfile)
@@ -144,6 +150,9 @@ if __name__ == "__main__":
     parser.add_argument("bkg_deco")
 
     parser.add_argument("--eff", type=float, default=0.6)
+    parser.add_argument("--bins", type=int, default=10)
+    parser.add_argument("--pt-max", type=float, default=300)
+    parser.add_argument("--y-zero", action="store_true")
     parser.add_argument("-o", dest="outfile", default="rej.pdf")
 
     group = parser.add_mutually_exclusive_group(required=True)
