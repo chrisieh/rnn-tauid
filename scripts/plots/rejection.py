@@ -38,15 +38,27 @@ def main(args):
         bkg_y = f["score"][bkg_idx:]
 
     # Load R21-TAUID
-    sig_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/sig1P_test_deco.h5"
-    bkg_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/bkg1P_test_deco.h5"
+    if args.mode1p:
+        sig_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/" \
+                           "sig1P_test_deco.h5"
+        bkg_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/" \
+                           "bkg1P_test_deco.h5"
+        scorename = "vars2016_pt_gamma_1p_isofix"
+    elif args.mode3p:
+        sig_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/" \
+                           "sig3P_test_deco.h5"
+        bkg_ntuple_fname = "/lustre/user/cdeutsch/Data/R21-Training/" \
+                           "bkg3P_test_deco.h5"
+        scorename = "vars2016_pt_gamma_3p_isofix"
+    else:
+        raise RuntimeError("This should not be reached!")
 
     with h5py.File(sig_ntuple_fname, "r") as s, \
          h5py.File(bkg_ntuple_fname, "r") as b:
         r21 = {
             "y_score": np.concatenate([
-                s["CollectionTree"]["vars2016_pt_gamma_1p_isofix"],
-                b["CollectionTree"]["vars2016_pt_gamma_1p_isofix"]
+                s["CollectionTree"][scorename],
+                b["CollectionTree"][scorename]
             ]),
             "y_true": np.concatenate([
                 np.ones(len(s["CollectionTree"])),
@@ -77,8 +89,9 @@ def main(args):
                                   r21["mu"][r21["is_sig"]],
                                   r21["y_score"][r21["is_sig"]])
 
-    assert np.isclose(np.count_nonzero(r21_passes_thr) / float(len(r21_passes_thr)),
-                      args.eff, atol=0, rtol=1e-2)
+    assert np.isclose(
+        np.count_nonzero(r21_passes_thr) / float(len(r21_passes_thr)), args.eff,
+        atol=0, rtol=1e-2)
 
     flat = Flattener(binnings.pt_flat, binnings.mu_flat, args.eff)
     passes_thr = flat.fit(sig_pt, sig_mu, sig_y)
@@ -96,7 +109,8 @@ def main(args):
     bin_half_width = bin_width(bins) / 2.0
 
     # Background efficiency
-    r21_bkg_eff = binned_efficiency(r21["pt"][~r21["is_sig"]], r21_bkg_pass_thr, bins=bins)
+    r21_bkg_eff = binned_efficiency(r21["pt"][~r21["is_sig"]], r21_bkg_pass_thr,
+                                    bins=bins)
     bkg_eff = binned_efficiency(bkg_pt, bkg_pass_thr, bins=bins)
 
     # Background rejection
@@ -119,7 +133,7 @@ def main(args):
     ax.set_ylabel("Inverse background efficiency", ha="right", y=1.0)
     ax.legend()
 
-    fig.savefig("rej.pdf")
+    fig.savefig(args.outfile)
 
 
 if __name__ == "__main__":
@@ -130,6 +144,11 @@ if __name__ == "__main__":
     parser.add_argument("bkg_deco")
 
     parser.add_argument("--eff", type=float, default=0.6)
+    parser.add_argument("-o", dest="outfile", default="rej.pdf")
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--mode1p", action="store_true")
+    group.add_argument("--mode3p", action="store_true")
 
     args = parser.parse_args()
     main(args)
