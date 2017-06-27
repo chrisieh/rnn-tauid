@@ -60,12 +60,12 @@ def main(args):
         ("Shrinkage", "MaxDepth")
     ]
     fixed_params = [
-        {"MaxDepth": 6, "MinNodeSize": 0.1},
-        {"Shrinkage": 0.1, "MinNodeSize": 0.1},
+        {"MaxDepth": 12, "MinNodeSize": 0.01},
+        {"Shrinkage": 0.1, "MinNodeSize": 0.01},
         {"NTrees": 400, "Shrinkage": 0.1},
-        {"NTrees": 400, "MinNodeSize": 0.1}
+        {"NTrees": 400, "MinNodeSize": 0.01}
     ]
-    zvar = "eff60"
+    zvar = "eff" + str(args.eff)
 
     for (xvar, yvar), params in zip(hists, fixed_params):
         # Select fixed parameters
@@ -92,7 +92,7 @@ def main(args):
 
         # Plot it
         fig, ax = plt.subplots()
-        im = ax.imshow(mat, interpolation="none", aspect="auto", origin="lower")
+        im = ax.imshow(mat, interpolation="nearest", aspect="auto", origin="lower")
 
         ax.set_xlabel(label_dict[xvar], ha="right", x=1.0)
         ax.set_ylabel(label_dict[yvar], ha="right", y=1.0)
@@ -127,6 +127,8 @@ def main(args):
         cb = fig.colorbar(im)
         cb.ax.minorticks_off()
         cb.ax.tick_params(length=4.0)
+        cb.set_label("Rejection at {}% signal eff.".format(args.eff),
+                     ha="right", y=1.0)
 
         fig.savefig("scan_{x}_{y}.pdf".format(x=xvar, y=yvar))
 
@@ -134,6 +136,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("table")
+    parser.add_argument("--eff", type=int, default=60)
 
     args = parser.parse_args()
     main(args)
