@@ -60,10 +60,10 @@ def main(args):
         ("Shrinkage", "MaxDepth")
     ]
     fixed_params = [
-        {"MaxDepth": 12, "MinNodeSize": 0.01},
+        {"MaxDepth": 6, "MinNodeSize": 0.01},
         {"Shrinkage": 0.1, "MinNodeSize": 0.01},
-        {"NTrees": 400, "Shrinkage": 0.1},
-        {"NTrees": 400, "MinNodeSize": 0.01}
+        {"NTrees": 800, "Shrinkage": 0.1},
+        {"NTrees": 800, "MinNodeSize": 0.01}
     ]
     zvar = "eff" + str(args.eff)
 

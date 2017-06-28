@@ -123,12 +123,13 @@ def main(args):
 
     # Plot
     fig, ax = plt.subplots()
+    if not args.no_r21:
+        ax.errorbar(bin_midpoint / 1000.0, r21_bkg_rej,
+                    xerr=bin_half_width / 1000.0, yerr=d_r21_bkg_rej,
+                    fmt="o", c="r", label="R21 Tau-ID", zorder=1)
     ax.errorbar(bin_midpoint / 1000.0, bkg_rej,
                 xerr=bin_half_width / 1000.0, yerr=d_bkg_rej,
-                fmt="o", label="Combined NN")
-    ax.errorbar(bin_midpoint / 1000.0, r21_bkg_rej,
-                xerr=bin_half_width / 1000.0, yerr=d_r21_bkg_rej,
-                fmt="o", label="R21 Tau-ID")
+                fmt="o", c="b", label="Combined NN", zorder=2)
     ax.set_xlim(20, args.pt_max)
     ax.set_xlabel("pt / GeV", ha="right", x=1.0)
     ax.set_ylabel("Inverse background efficiency", ha="right", y=1.0)
@@ -153,6 +154,7 @@ if __name__ == "__main__":
     parser.add_argument("--bins", type=int, default=10)
     parser.add_argument("--pt-max", type=float, default=300)
     parser.add_argument("--y-zero", action="store_true")
+    parser.add_argument("--no-r21", action="store_true")
     parser.add_argument("-o", dest="outfile", default="rej.pdf")
 
     group = parser.add_mutually_exclusive_group(required=True)

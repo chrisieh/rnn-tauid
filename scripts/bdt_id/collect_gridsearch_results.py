@@ -7,6 +7,7 @@ import h5py
 import pandas as pd
 from sklearn.metrics import roc_curve, roc_auc_score
 from scipy.interpolate import interp1d
+from scipy.stats import ks_2samp
 
 
 def main(args):
@@ -16,7 +17,8 @@ def main(args):
     data = {"name": [], "train_time": [], "MaxDepth": [], "MinNodeSize": [],
             "NTrees": [], "Shrinkage": []}
 
-    metrics = {"roc_auc": [], "roc_auc_train": []}
+    metrics = {"roc_auc": [], "roc_auc_train": [], "ks_pval_sig": [],
+               "ks_pval_bkg": []}
 
     # Efficiencies to evaluate
     efficiencies = [5 * i for i in range(4, 20)]
@@ -97,6 +99,13 @@ def main(args):
         for eff in efficiencies:
             metrics["eff" + str(eff)].append(roc(eff / 100.0))
             metrics["eff" + str(eff) + "_train"].append(roc_train(eff / 100.0))
+
+        # KS-Test
+        ks_sig = ks_2samp(y[y_true == 1], y_train[y_true_train == 1])
+        ks_bkg = ks_2samp(y[y_true == 0], y_train[y_true_train == 0])
+
+        metrics["ks_pval_sig"].append(ks_sig.pvalue)
+        metrics["ks_pval_bkg"].append(ks_bkg.pvalue)
 
     config_df = pd.DataFrame(data)
     metrics_df = pd.DataFrame(metrics)

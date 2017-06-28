@@ -10,11 +10,9 @@ def main(args):
     if args.variables:
         import imp
         var_mod = imp.load_source("var_mod", args.variables)
+        invars = var_mod.invars
     else:
         from rnn_tauid.common.variables import cluster_vars as invars
-
-    # Variable names
-    variables = [v for v, _, _ in invars]
 
     # Load preprocessing rules
     with h5py.File(args.preprocessing, "r") as f:
@@ -24,7 +22,7 @@ def main(args):
 
     # Load model
     model = load_model(args.model)
-    num=6 # TODO: EXTRACT THIS FROM MODEL FILE
+    num = 6
 
     # Load the data
     h5file = dict(driver="family", memb_size=10*1024**3)
