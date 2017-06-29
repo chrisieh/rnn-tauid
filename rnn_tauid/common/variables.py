@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 from rnn_tauid.common.preprocessing import scale, scale_flat, robust_scale, \
-                                           constant_scale
+                                           constant_scale, min_max_scale
 
 
 # Template for log10(x + epsilon)
@@ -139,14 +139,16 @@ def Phi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi"
     np.add(dest[dest_sel], phi[source_sel[0]][:, np.newaxis], out=dest[dest_sel])
 
 
-def dEta(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedEta"):
-    eta_jet = datafile["TauJets/Eta"][source_sel[0]]
+def dEta(datafile, dest, source_sel=None, dest_sel=None,
+         var="TauPFOs/chargedEta", refvar="TauJets/Eta"):
+    eta_jet = datafile[refvar][source_sel[0]]
     datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.subtract(dest[dest_sel], eta_jet[:, np.newaxis], out=dest[dest_sel])
 
 
-def dPhi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi"):
-    phi_jet = datafile["TauJets/Phi"][source_sel[0]]
+def dPhi(datafile, dest, source_sel=None, dest_sel=None,
+         var="TauPFOs/chargedPhi", refvar="TauJets/Phi"):
+    phi_jet = datafile[refvar][source_sel[0]]
     datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.subtract(dest[dest_sel], phi_jet[:, np.newaxis], out=dest[dest_sel])
     np.add(dest[dest_sel], np.pi, out=dest[dest_sel])
@@ -154,11 +156,12 @@ def dPhi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi
     np.subtract(dest[dest_sel], np.pi, out=dest[dest_sel])
 
 
-def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPt"):
+def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None,
+               var="TauPFOs/chargedPt", ptvar="TauJets/Pt"):
     # Hack to set nans
     datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
-    pt = datafile["TauJets/Pt"]
+    pt = datafile[ptvar]
 
     np.add(dest[dest_sel], np.log10(pt[source_sel[0]])[:, np.newaxis],
            out=dest[dest_sel])
@@ -240,7 +243,6 @@ neutral_secondEtaWRTClusterPosition_EM1_log =partial(
 neutral_SECOND_ENG_DENS_log = partial(log10_epsilon, var="TauPFOs/neutral_SECOND_ENG_DENS",
                                       epsilon=1e-8)
 
-
 # Conversion tracks
 conversion_Eta = partial(Eta, var="TauConv/eta")
 conversion_Phi = partial(Phi, var="TauConv/phi")
@@ -253,31 +255,39 @@ conversion_dPhi_extrapol = partial(dPhi_extrap, var="TauConv/phi_extrap")
 conversion_Pt_log = partial(log10_epsilon, var="TauConv/pt")
 conversion_Pt_jet_log = partial(Pt_jet_log, var="TauConv/pt")
 
+# For Track-RNN ID
+track_dEta = partial(dEta, var="TauTracks/eta", refvar="TauJets/eta")
+track_dPhi = partial(dPhi, var="TauTracks/phi", refvar="TauJets/phi")
 
 track_vars = [
-    ("TauTracks/pt_log", pt_log, scale),
-    ("TauTracks/pt_asym", pt_asym, scale),
-    ("TauTracks/d0_abs_log", d0_abs_log, scale),
-    ("TauTracks/z0sinThetaTJVA_abs_log", z0sinThetaTJVA_abs_log, scale),
+    ("TauTracks/pt_log", pt_log, partial(scale, per_obj=False)),
+    ("TauTracks/pt_asym", pt_asym, partial(scale, per_obj=False)),
+    ("TauTracks/d0_abs_log", d0_abs_log, partial(scale, per_obj=False)),
+    ("TauTracks/z0sinThetaTJVA_abs_log", z0sinThetaTJVA_abs_log,
+     partial(scale, per_obj=False)),
     ("TauTracks/dRJetSeedAxis", None, partial(constant_scale, scale=0.4)),
     ("TauTracks/eProbabilityHT", None, None),
-    ("TauTracks/nInnermostPixelHits", None, partial(constant_scale, scale=3)),
-    ("TauTracks/nPixelHits", None, partial(constant_scale, scale=11)),
-    ("TauTracks/nSCTHits", None, partial(constant_scale, scale=20))
+    ("TauTracks/nInnermostPixelHits", None,
+     partial(min_max_scale, per_obj=False)),
+    ("TauTracks/nPixelHits", None, partial(min_max_scale, per_obj=False)),
+    ("TauTracks/nSCTHits", None, partial(min_max_scale, per_obj=False))
 ]
 
 cluster_vars = [
-    ("TauClusters/et_log", et_log, scale),
+    ("TauClusters/et_log", et_log, partial(scale, per_obj=False)),
     ("TauClusters/psfrac", None, None),
     ("TauClusters/em1frac", None, None),
     ("TauClusters/em2frac", None, None),
     ("TauClusters/em3frac", None, None),
     ("TauClusters/dRJetSeedAxis", None, partial(constant_scale, scale=0.4)),
     ("TauClusters/EM_PROBABILITY", None, None),
-    ("TauClusters/SECOND_R", SECOND_R_log, scale),
-    ("TauClusters/SECOND_LAMBDA", SECOND_LAMBDA_log, scale),
-    ("TauClusters/FIRST_ENG_DENS", FIRST_ENG_DENS_log, scale),
-    ("TauClusters/CENTER_LAMBDA", CENTER_LAMBDA_log, scale),
+    ("TauClusters/SECOND_R", SECOND_R_log, partial(scale, per_obj=False)),
+    ("TauClusters/SECOND_LAMBDA", SECOND_LAMBDA_log,
+     partial(scale, per_obj=False)),
+    ("TauClusters/FIRST_ENG_DENS", FIRST_ENG_DENS_log,
+     partial(scale, per_obj=False)),
+    ("TauClusters/CENTER_LAMBDA", CENTER_LAMBDA_log,
+     partial(scale, per_obj=False)),
     ("TauClusters/ENG_FRAC_MAX", None, None)
 ]
 
