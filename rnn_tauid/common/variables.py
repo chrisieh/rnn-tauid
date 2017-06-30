@@ -261,11 +261,14 @@ track_dPhi = partial(dPhi, var="TauTracks/phi", refvar="TauJets/phi")
 
 track_vars = [
     ("TauTracks/pt_log", pt_log, partial(scale, per_obj=False)),
-    ("TauTracks/pt_asym", pt_asym, partial(scale, per_obj=False)),
+    ("TauTracks/pt_jetseed_log",
+     partial(Pt_jet_log, var="TauTracks/pt", ptvar="TauJets/ptJetSeed"),
+     partial(scale, per_obj=False)),
     ("TauTracks/d0_abs_log", d0_abs_log, partial(scale, per_obj=False)),
     ("TauTracks/z0sinThetaTJVA_abs_log", z0sinThetaTJVA_abs_log,
      partial(scale, per_obj=False)),
-    ("TauTracks/dRJetSeedAxis", None, partial(constant_scale, scale=0.4)),
+    ("TauTracks/dEta", track_dEta, partial(constant_scale, scale=0.4)),
+    ("TauTracks/dPhi", track_dPhi, partial(constant_scale, scale=0.4)),
     ("TauTracks/eProbabilityHT", None, None),
     ("TauTracks/nInnermostPixelHits", None,
      partial(min_max_scale, per_obj=False)),
