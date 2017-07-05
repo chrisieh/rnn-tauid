@@ -5,6 +5,7 @@ from glob import glob
 
 import h5py
 import pandas as pd
+import numpy as np
 from sklearn.metrics import roc_curve, roc_auc_score
 from scipy.interpolate import interp1d
 from scipy.stats import ks_2samp
@@ -21,7 +22,7 @@ def main(args):
                "ks_pval_bkg": []}
 
     # Efficiencies to evaluate
-    efficiencies = [5 * i for i in range(4, 20)]
+    efficiencies = [5 * i for i in range(9, 20)]
     for eff in efficiencies:
         metrics["eff" + str(eff)] = []
         metrics["eff" + str(eff) + "_train"] = []
@@ -97,8 +98,19 @@ def main(args):
                              assume_sorted=True)
 
         for eff in efficiencies:
-            metrics["eff" + str(eff)].append(roc(eff / 100.0))
-            metrics["eff" + str(eff) + "_train"].append(roc_train(eff / 100.0))
+            try:
+                metrics["eff" + str(eff)].append(roc(eff / 100.0))
+            except ValueError:
+                print("Error interpolating roc at {} eff. - test".format(eff))
+                print("Min. eff-test: {}".format(roc_eff.min()))
+                metrics["eff" + str(eff)].append(None)
+
+            try:
+                metrics["eff" + str(eff) + "_train"].append(roc_train(eff / 100.0))
+            except ValueError:
+                print("Error interpolating roc at {} eff. - train".format(eff))
+                print("Min. eff-train: {}".format(roc_eff_train.min()))
+                metrics["eff" + str(eff) + "_train"].append(None)
 
         # KS-Test
         ks_sig = ks_2samp(y[y_true == 1], y_train[y_true_train == 1])

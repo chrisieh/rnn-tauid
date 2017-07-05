@@ -255,9 +255,11 @@ conversion_dPhi_extrapol = partial(dPhi_extrap, var="TauConv/phi_extrap")
 conversion_Pt_log = partial(log10_epsilon, var="TauConv/pt")
 conversion_Pt_jet_log = partial(Pt_jet_log, var="TauConv/pt")
 
-# For Track-RNN ID
+# For Track & Cluster RNN
 track_dEta = partial(dEta, var="TauTracks/eta", refvar="TauJets/eta")
 track_dPhi = partial(dPhi, var="TauTracks/phi", refvar="TauJets/phi")
+cluster_dEta = partial(dEta, var="TauClusters/eta", refvar="TauJets/eta")
+cluster_dPhi = partial(dPhi, var="TauClusters/phi", refvar="TauJets/phi")
 
 track_vars = [
     ("TauTracks/pt_log", pt_log, partial(scale, per_obj=False)),
