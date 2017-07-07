@@ -8,7 +8,12 @@ from sklearn.metrics import confusion_matrix
 import matplotlib as mpl
 mpl.use("PDF")
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup()
+mpl_setup(scale=0.48, aspect_ratio=8.0 / 6.0, pad_left=0.20, pad_right=1.0)
+mpl.rcParams["xtick.labelsize"] = 7
+mpl.rcParams["ytick.labelsize"] = 7
+mpl.rcParams["xtick.major.size"] = 4
+mpl.rcParams["ytick.major.size"] = 4
+
 import matplotlib.pyplot as plt
 
 
@@ -73,7 +78,9 @@ def main(args):
     fig, ax = plt.subplots()
     ax.imshow(cm, vmin=0, vmax=100, cmap="Blues")
 
-    ticklabels = ["1p0n", "1p1n", "1pXn", "3p0n", "3pXn"]
+    # ticklabels = ["1p0n", "1p1n", "1pXn", "3p0n", "3pXn"]
+    ticklabels = [r"$h^\pm$", r"$h^\pm \pi^0$", r"$h^\pm \geq 2 \pi^0$",
+                  r"$3 h^\pm$", r"$3 h^\pm \geq 1 \pi^0$"]
 
     ax.minorticks_off()
     ax.set_xticks(np.arange(cm.shape[0]))
@@ -83,18 +90,26 @@ def main(args):
     ax.set_yticklabels(ticklabels[::-1])
     ax.get_yaxis().set_ticks_position("left")
 
-    ax.set_xlabel("True Tau Decay Mode", ha="right", x=1.0)
-    ax.set_ylabel("Reco Tau Decay Mode", ha="right", y=1.0)
+    ax.set_xlabel("True Decay Mode", ha="right", x=1.0)
+    ax.set_ylabel("Reconstructed Decay Mode", ha="right", y=1.0)
 
     # Set values on plot
     for i, j in product(range(cm.shape[0]), range(cm.shape[0])):
-        ax.text(i, j, "{:.1f}".format(np.round(cm[j,i], decimals=1)+0), ha="center", va="center")
+        ax.text(i, j, "{:.1f}".format(np.round(cm[j,i], decimals=1)+0),
+                ha="center", va="center", fontsize=7)
 
     ax.set_ylim(4.5, -1.5)
     ax.set_aspect(0.7)
 
-    ax.text(4.25, -1, "Diagonal efficiency: {:.1f}%".format(100 * diag_eff),
+    ax.text(4.35, -1, "Diagonal efficiency:\n{:.1f}%".format(100 * diag_eff),
             ha="right", va="center")
+
+    if args.composition:
+        norm_label = "Row\nnorm."
+    else:
+        norm_label = "Column\nnorm."
+
+    ax.text(-0.35, -1, norm_label, va="center")
 
     fig.savefig(args.out)
 
