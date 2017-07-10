@@ -23,7 +23,7 @@ class AnalysisSelector : public TSelector
     TTree *fOutTree = 0;
     std::string fout_name;
     bool deco_truth;
-    
+
     // Readers to access the data (delete the ones you do not need).
     using vfloat = vector<float>;
     using TRA_int = TTreeReaderArray<int>;
@@ -32,13 +32,17 @@ class AnalysisSelector : public TSelector
     using TRA_double = TTreeReaderArray<double>;
     using TRA_vfloat = TTreeReaderArray<vfloat>;
     using TRA_vuint8 = TTreeReaderArray<vector<uint8_t>>;
-    
+
     // Truth variables
     TTreeReaderArray<unsigned long> *reader_truthProng = 0;
     TTreeReaderArray<double> *reader_truthEtaVis = 0;
     TTreeReaderArray<double> *reader_truthPtVis = 0;
     TTreeReaderArray<char> *reader_IsTruthMatched = 0;
     TTreeReaderArray<unsigned long> *reader_truthDecayMode = 0;
+
+    // mcEventNumber
+    TTreeReaderArray<unsigned long long> reader_mcEventNumber = {
+        fReader, "TauJetsAuxDyn.mcEventNumber"};
 
     // TauJets variables
     TRA_int reader_nTracks = {fReader, "TauJetsAuxDyn.nTracks"};
@@ -48,7 +52,7 @@ class AnalysisSelector : public TSelector
     /* TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"}; */
     TRA_float reader_eta = {fReader, "TauJetsAuxDyn.eta"};
     TRA_float reader_phi = {fReader, "TauJetsAuxDyn.phi"};
-    
+
     // TauJets variables
     TRA_double reader_mu = {fReader, "TauJetsAuxDyn.mu"};
     TRA_int reader_nVtxPU = {fReader, "TauJetsAuxDyn.nVtxPU"};
@@ -64,7 +68,7 @@ class AnalysisSelector : public TSelector
     TRA_float reader_massTrkSys = {fReader, "TauJetsAuxDyn.massTrkSys"};
     TRA_float reader_etOverPtLeadTrk = {fReader, "TauJetsAuxDyn.etOverPtLeadTrk"};
     TRA_float reader_ptIntermediateAxis = {fReader, "TauJetsAuxDyn.ptIntermediateAxis"};
-    
+
     /* // Track-based variables */
     /* TRA_uint8 reader_trk_nTracksTotal = {fReader, "TauJetsAuxDyn.trk_nTracksTotal"}; */
     /* TRA_vfloat reader_trk_pt = {fReader, "TauJetsAuxDyn.trk_pt"}; */
@@ -119,6 +123,9 @@ class AnalysisSelector : public TSelector
     double v_truthPtVis;
     char v_IsTruthMatched;
     unsigned long v_truthDecayMode;
+
+    // mcEventNumber
+    unsigned long long v_mcEventNumber;
 
     // TauJets variables
     int v_nTracks;
@@ -202,7 +209,10 @@ class AnalysisSelector : public TSelector
     TBranch *b_truthPtVis = 0;
     TBranch *b_IsTruthMatched = 0;
     TBranch *b_truthDecayMode = 0;
-    
+
+    // mcEventNumber
+    TBranch *b_mcEventNumber = 0;
+
     // TauJets branches
     TBranch *b_pt = 0;
     TBranch *b_eta = 0;
@@ -276,8 +286,8 @@ class AnalysisSelector : public TSelector
     TBranch *b_cls_FIRST_ENG_DENS = 0;
     TBranch *b_cls_CENTER_LAMBDA = 0;
     TBranch *b_cls_ENG_FRAC_MAX = 0;
-    
-    
+
+
     AnalysisSelector(TTree * /*tree*/ = 0){ fout_name = "temp.root"; }
     AnalysisSelector(std::string fout, bool truth) {
         fout_name = fout;

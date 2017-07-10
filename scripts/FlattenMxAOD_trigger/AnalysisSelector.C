@@ -55,6 +55,10 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
             "TauJets.truthDecayMode", &v_truthDecayMode, "TauJets.truthDecayMode/I");
     }
 
+    // mcEventNumber should be
+    b_mcEventNumber = fOutTree->Branch(
+        "TauJets.mcEventNumber", &v_mcEventNumber, "TauJets.mcEventNumber/l");
+
     b_pt = fOutTree->Branch(
         "TauJets.pt", &v_pt, "TauJets.pt/F");
     b_eta = fOutTree->Branch(
@@ -247,7 +251,7 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         // v_trk_nSCTDoubleHoles.clear();
         // v_trk_nTRTHits.clear();
         // v_trk_nTRTDead.clear();
-        
+
         // Clear cluster vectors
         v_cls_e.clear();
         v_cls_et.clear();
@@ -264,7 +268,7 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_cls_FIRST_ENG_DENS.clear();
         v_cls_CENTER_LAMBDA.clear();
         v_cls_ENG_FRAC_MAX.clear();
-        
+
         // set tau properties for branches
         if (deco_truth)
         {
@@ -274,6 +278,9 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
             v_IsTruthMatched = (*reader_IsTruthMatched)[itau];
             v_truthDecayMode = (*reader_truthDecayMode)[itau];
         }
+
+        // mcEventNumber
+        v_mcEventNumber = reader_mcEventNumber[itau];
 
         // TauJet variables
         v_pt = reader_pt[itau];
@@ -300,7 +307,7 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
 
         // nTracksTotal
         //v_trk_nTracksTotal = reader_trk_nTracksTotal[itau];
-        
+
         // nClustersTotal
         v_cls_nClustersTotal = reader_cls_nClustersTotal[itau];
 
@@ -339,7 +346,7 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         //     v_trk_nTRTHits.push_back(reader_trk_nTRTHits[itau][itrack]);
         //     v_trk_nTRTDead.push_back(reader_trk_nTRTDead[itau][itrack]);
         // }
-        
+
         for (size_t icluster = 0; icluster < reader_cls_e[itau].size(); icluster++)
         {
             v_cls_e.push_back(reader_cls_e[itau][icluster]);
