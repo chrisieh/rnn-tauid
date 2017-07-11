@@ -9,9 +9,10 @@ mpl.use("PDF")
 
 import matplotlib.pyplot as plt
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup()
+mpl_setup(scale=0.48)
 
 from rnn_tauid.evaluation.misc import bin_center, bin_width
+from rnn_tauid.common.preprocessing import pt_reweight
 
 
 def overlay(s, sw, b, bw, bins=None):
@@ -55,24 +56,33 @@ def main(args):
         sig_n_trk = f["TauJets/nTracksTotal"][...]
         sig_n_chr_trk = f["TauJets/nTracks"][...]
         sig_n_cls = f["TauJets/nClustersTotal"][...]
+        sig_pt = f["TauJets/pt"][...]
 
 
     with h5py.File(args.bkg, "r", driver="family", memb_size=10*1024**3) as f:
         bkg_n_trk = f["TauJets/nTracksTotal"][...]
         bkg_n_chr_trk = f["TauJets/nTracks"][...]
         bkg_n_cls = f["TauJets/nClustersTotal"][...]
+        bkg_pt = f["TauJets/pt"][...]
 
     if args.mode1p:
+        # Selection
+        sig_sel = (sig_n_chr_trk == 1)
+        bkg_sel = (bkg_n_chr_trk == 1)
+
+        # pt-reweight
+        sw, bw = pt_reweight(sig_pt[sig_sel], bkg_pt[bkg_sel])
+
         # nTracks Plot 1P
         nbins = 50
         bins = np.arange(0, nbins + 4, 2) - 1
 
-        fig, ax = overlay(sig_n_trk, np.ones_like(sig_n_trk),
-                          bkg_n_trk, np.ones_like(bkg_n_trk),
+        fig, ax = overlay(sig_n_trk[sig_sel], sw,
+                          bkg_n_trk[bkg_sel], bw,
                           bins=bins)
         ax.set_xlim(0, nbins)
-        ax.set_xlabel("$N_\\mathrm{track}$", ha="right", x=1.0)
-        ax.set_ylabel("Normalized number of events", ha="right", y=1.0)
+        ax.set_xlabel("Number of tracks", ha="right", x=1.0)
+        ax.set_ylabel("Normalised number of events", ha="right", y=1.0)
 
         fig.savefig("ntrk_1p.pdf")
 
@@ -80,25 +90,32 @@ def main(args):
         nbins = 30
         bins = np.arange(0, nbins + 2, 1) - 0.5
 
-        fig, ax = overlay(sig_n_cls, np.ones_like(sig_n_cls),
-                          bkg_n_cls, np.ones_like(bkg_n_cls),
+        fig, ax = overlay(sig_n_cls[sig_sel], sw,
+                          bkg_n_cls[bkg_sel], bw,
                           bins=bins)
         ax.set_xlim(0, nbins)
-        ax.set_xlabel("$N_\\mathrm{cluster}$", ha="right", x=1.0)
-        ax.set_ylabel("Normalized number of events", ha="right", y=1.0)
+        ax.set_xlabel("Number of clusters", ha="right", x=1.0)
+        ax.set_ylabel("Normalised number of events", ha="right", y=1.0)
 
         fig.savefig("ncls_1p.pdf")
     elif args.mode3p:
+        # Selection
+        sig_sel = (sig_n_chr_trk == 3)
+        bkg_sel = (bkg_n_chr_trk == 3)
+
+        # pt-reweight
+        sw, bw = pt_reweight(sig_pt[sig_sel], bkg_pt[bkg_sel])
+
         # nTracks Plot 3P
         nbins = 50
         bins = np.arange(0, nbins + 4, 2) - 1
 
-        fig, ax = overlay(sig_n_trk, np.ones_like(sig_n_trk),
-                          bkg_n_trk, np.ones_like(bkg_n_trk),
+        fig, ax = overlay(sig_n_trk[sig_sel], sw,
+                          bkg_n_trk[bkg_sel], bw,
                           bins=bins)
         ax.set_xlim(0, nbins)
-        ax.set_xlabel("$N_\\mathrm{track}$", ha="right", x=1.0)
-        ax.set_ylabel("Normalized number of events", ha="right", y=1.0)
+        ax.set_xlabel("Number of tracks", ha="right", x=1.0)
+        ax.set_ylabel("Normalised number of events", ha="right", y=1.0)
 
         fig.savefig("ntrk_3p.pdf")
 
@@ -106,12 +123,12 @@ def main(args):
         nbins = 30
         bins = np.arange(0, nbins + 2, 1) - 0.5
 
-        fig, ax = overlay(sig_n_cls, np.ones_like(sig_n_cls),
-                          bkg_n_cls, np.ones_like(bkg_n_cls),
+        fig, ax = overlay(sig_n_cls[sig_sel], sw,
+                          bkg_n_cls[bkg_sel], bw,
                           bins=bins)
         ax.set_xlim(0, nbins)
-        ax.set_xlabel("$N_\\mathrm{cluster}$", ha="right", x=1.0)
-        ax.set_ylabel("Normalized number of events", ha="right", y=1.0)
+        ax.set_xlabel("Number of clusters", ha="right", x=1.0)
+        ax.set_ylabel("Normalised number of events", ha="right", y=1.0)
 
         fig.savefig("ncls_3p.pdf")
 

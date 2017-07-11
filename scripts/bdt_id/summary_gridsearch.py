@@ -10,11 +10,19 @@ def main(args):
 
     # Read data
     df = pd.read_csv(args.infile)
+    df["subsampling"] = False
+
+    if args.infile_subsampling:
+        df2 = pd.read_csv(args.infile_subsampling)
+        df2["subsampling"] = True
+
+        # Merge with old one
+        df = pd.concat([df, df2], ignore_index=True)
 
     # Columns to print
-    pcols = ["MaxDepth", "MinNodeSize", "NTrees", "Shrinkage", "name",
-             "train_time", effstr, effstr_train, "ks_pval_sig", "ks_pval_bkg",
-             "ratio"]
+    pcols = ["MaxDepth", "MinNodeSize", "NTrees", "Shrinkage", "subsampling",
+             "name", "train_time", effstr, effstr_train, "ks_pval_sig",
+             "ks_pval_bkg", "ratio"]
 
     print("Selected performance metric: {}".format(effstr))
 
@@ -40,6 +48,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("infile")
+    parser.add_argument("infile_subsampling", default=None)
     parser.add_argument("--eff", type=int, default=60)
 
     args = parser.parse_args()
