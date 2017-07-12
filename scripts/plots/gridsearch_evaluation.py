@@ -8,12 +8,11 @@ mpl.use("PDF")
 
 import matplotlib.pyplot as plt
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup()
+mpl_setup(scale=0.48, pad_right=0.93)
 
 
 def main(args):
     table = pd.read_csv(args.table)
-
     print(table.head())
 
     # Unique parameter settings
@@ -26,17 +25,17 @@ def main(args):
 
     # Axes label
     label_dict = {
-        "NTrees": r"Number of trees $N_\mathrm{Tree}$",
+        "NTrees": r"Number of trees $N_\mathrm{trees}$",
         "Shrinkage": r"Shrinkage $\eta$",
-        "MaxDepth": r"Maximum tree depth $d_\mathrm{Tree}$",
-        "MinNodeSize": r"Minimum node size $f_\mathrm{min}^\mathrm{node} \, / \, \%$"
+        "MaxDepth": r"Maximum tree depth $d_\mathrm{tree}$",
+        "MinNodeSize": r"Minimum node size $f_\mathrm{node}^\mathrm{min} \, / \, \%$"
     }
 
     text_dict = {
-        "NTrees": "$ N_\\mathrm{{Tree}} = {} $",
+        "NTrees": "$ N_\\mathrm{{trees}} = {} $",
         "Shrinkage": "$ \\eta = {} $",
-        "MaxDepth": "$ d_\\mathrm{{Tree}} = {} $",
-        "MinNodeSize": "$ f_\\mathrm{{min}}^\\mathrm{{node}} = {}\\%% $"
+        "MaxDepth": "$ d_\\mathrm{{tree}} = {} $",
+        "MinNodeSize": "$ f_\\mathrm{{node}}^\\mathrm{{min}} = {}\\%% $"
     }
 
     # Working points
@@ -60,10 +59,10 @@ def main(args):
         ("Shrinkage", "MaxDepth")
     ]
     fixed_params = [
-        {"MaxDepth": 6, "MinNodeSize": 0.1},
+        {"MaxDepth": 8, "MinNodeSize": 0.1},
         {"Shrinkage": 0.1, "MinNodeSize": 0.1},
-        {"NTrees": 800, "Shrinkage": 0.1},
-        {"NTrees": 800, "MinNodeSize": 0.1}
+        {"NTrees": 400, "Shrinkage": 0.1},
+        {"NTrees": 400, "MinNodeSize": 0.1}
     ]
     zvar = "eff" + str(args.eff)
 
@@ -111,7 +110,7 @@ def main(args):
 
         ax.minorticks_off()
 
-        xlim = ax.get_ylim()
+        xlim = ax.get_xlim()
         ylim = ax.get_ylim()
         ax.set_ylim(ylim[0], ylim[1] + 1)
 
@@ -121,14 +120,16 @@ def main(args):
             label.append(text_dict[k].format(v))
         label = ", ".join(label)
         dx = xlim[1] - xlim[0]
-        ax.text(-1 + 0.13 * dx, ylim[1] + 0.5, label, va="center")
+        ax.text(-0.4, ylim[1] + 0.5, label, va="center", fontsize=8)
+
+        ax.text(xlim[1] - 0.1, ylim[1] + 0.5, "{} % sig.\nefficiency".format(args.eff),
+                va="center", ha="right", fontsize=8)
 
         # Colorbar
         cb = fig.colorbar(im)
         cb.ax.minorticks_off()
         cb.ax.tick_params(length=4.0)
-        cb.set_label("Rejection at {}% signal eff.".format(args.eff),
-                     ha="right", y=1.0)
+        cb.set_label("Rejection", ha="right", y=1.0)
 
         fig.savefig("scan_{x}_{y}.pdf".format(x=xvar, y=yvar))
 
