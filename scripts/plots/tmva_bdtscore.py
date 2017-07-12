@@ -89,7 +89,8 @@ def main(args):
     ax.set_yscale("log")
 
     ax.text(0.3725, 0.52,
-            "KS-Test p-value\nSig.: {:.1%}\nBkg.: {:.1%}".format(sig_pval, bkg_pval),
+            "KS-Test $p$-values:\n$p_\\mathrm{{sig}} = {:.1f} \\, \\%$"
+            "\n$p_\\mathrm{{bkg}} = {:.1f} \\, \\%$".format(100*sig_pval, 100*bkg_pval),
             va="top", transform=ax.transAxes)
 
     fig.savefig(args.outfile)

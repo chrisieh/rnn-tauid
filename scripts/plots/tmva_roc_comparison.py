@@ -7,10 +7,11 @@ mpl.use("PDF")
 
 import matplotlib.pyplot as plt
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup(aspect_ratio=1.0, pad_bottom=0.12)
+mpl_setup(scale=0.48, aspect_ratio=1.0, pad_bottom=0.12)
 
 from sklearn.metrics import roc_curve
 from scipy.interpolate import interp1d
+
 
 def roc(*args, **kwargs):
     fpr, tpr, thr = roc_curve(*args, **kwargs)
@@ -70,34 +71,40 @@ def main(args):
 
     # Plotting code
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1], hspace=0.06)
+    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1], hspace=0.08)
 
     # ROC
     ax0 = plt.subplot(gs[0])
-    ax0.plot(eff_ref, rej_ref, label="Reference")
-    for eff, rej, score in zip(eff_add, rej_add, args.add_score):
-        ax0.plot(eff, rej, label=score)
+    ax0.plot(eff_ref, rej_ref, c="k", label="Reference")
+    for eff, rej, score, c in zip(eff_add, rej_add, args.add_score, ["r", "b"]):
+        if "subsampling" in score:
+            label="BDT B"
+        else:
+            label="BDT A"
+        ax0.plot(eff, rej, c=c, label=label)
 
     ax0.set_yscale("log")
-    ax0.set_ylim(1, 1e5)
+    ax0.set_ylim(1, 1e4)
     ax0.set_ylabel("Rejection", ha="right", y=1.0)
     ax0.tick_params(labelbottom="off")
     ax0.legend()
 
     # Ratio
-    x = np.linspace(0.05, 1.0, 100)
+    xfull = np.linspace(0.0, 1.0, 10)
+    x = np.linspace(0.1, 1.0, 200)
 
     ax1 = plt.subplot(gs[1], sharex=ax0)
-    ax1.plot(x, roc_interp_ref(x) / roc_interp_ref(x), label="Reference")
+    ax1.plot(xfull, np.ones_like(xfull), c="k", label="Reference")
 
-    for roc_interp, score in zip(roc_interp_add, args.add_score):
-        ax1.plot(x, roc_interp(x) / roc_interp_ref(x), label=score)
+    for roc_interp, score, c in zip(roc_interp_add, args.add_score, ["r", "b"]):
+        ax1.plot(x, roc_interp(x) / roc_interp_ref(x), c=c)
 
     ax1.set_xlabel("Signal efficiency", ha="right", x=1.0)
-    ax1.set_ylabel("Ratio")#, ha="right", y=1.0)
+    ax1.set_ylabel("Ratio", ha="right", y=1.0)
 
     ylim = ax1.get_ylim()
-    ax1.set_ylim(min(*ylim) - 0.05, max(*ylim) + 0.05)
+    ax1.set_ylim(0.9, 1.5)
+    ax1.set_yticks([1.0, 1.2, 1.4])
 
     fig.savefig(args.outfile)
 

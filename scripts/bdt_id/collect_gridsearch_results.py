@@ -16,7 +16,7 @@ def main(args):
     n_algs = len(algs)
 
     data = {"name": [], "train_time": [], "MaxDepth": [], "MinNodeSize": [],
-            "NTrees": [], "Shrinkage": []}
+            "NTrees": [], "Shrinkage": [], "AdaBoostBeta": []}
 
     metrics = {"roc_auc": [], "roc_auc_train": [], "ks_pval_sig": [],
                "ks_pval_bkg": []}
@@ -52,8 +52,12 @@ def main(args):
         data["train_time"].append(config["info"]["train_time"])
 
         opts = config["config"]["algopts"]
-        for algopt in ["MaxDepth", "MinNodeSize", "NTrees", "Shrinkage"]:
-            data[algopt].append(opts[algopt])
+        for algopt in ["MaxDepth", "MinNodeSize", "NTrees", "Shrinkage",
+                       "AdaBoostBeta"]:
+            if algopt in opts:
+                data[algopt].append(opts[algopt])
+            else:
+                data[algopt].append(None)
 
         # Read data from TMVA_slimmed.h5
         with h5py.File(tmva_slimmed, "r") as f:
