@@ -9,7 +9,7 @@ mpl.use("PDF")
 
 import matplotlib.pyplot as plt
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup()
+mpl_setup(scale=0.48)
 
 from rnn_tauid.evaluation.misc import bin_center, bin_width
 
@@ -71,7 +71,7 @@ def main(args):
             label=r"$R^{0.2}_\mathrm{track}$"
         ),
         "absipSigLeadTrk": Var(
-            bins=np.linspace(0.0, 15.0, 23), func=None,
+            bins=np.linspace(0.0, 12.0, 23), func=None,
             label=r"$\left| S_\mathrm{leadtrack} \right|$"
         ),
         "SumPtTrkFrac": Var(
@@ -168,7 +168,7 @@ def main(args):
             label=r"$R^{0.2}_\mathrm{track}$"
         ),
         "absipSigLeadTrk": Var(
-            bins=np.linspace(0.0, 15.0, 23),
+            bins=np.linspace(0.0, 12.0, 23),
             func=lambda x: np.minimum(x, 30),
             label=r"$\left| S_\mathrm{leadtrack} \right|$"
         ),
@@ -297,7 +297,7 @@ def main(args):
         else:
             ax.set_xlabel(var, ha="right", x=1)
 
-        ax.set_ylabel("Tau candidates", ha="right", y=1)
+        ax.set_ylabel("Normalised number of events", ha="right", y=1)
 
         fig.savefig(os.path.join(args.outdir, var + ".pdf"))
 

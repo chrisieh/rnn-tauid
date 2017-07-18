@@ -84,7 +84,7 @@ def main(args):
               test_score[~test_sig], test_weight[~test_sig],
               bins=bins)
 
-    ax.set_ylim(0.05, 10)
+    ax.set_ylim(args.y_range)
     leg = ax.legend(loc="upper center")
     ax.set_yscale("log")
 
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file")
     parser.add_argument("-o", dest="outfile", required=True)
+    parser.add_argument("--y-range", nargs=2, type=float, default=(0.05, 10))
 
     args = parser.parse_args()
     main(args)

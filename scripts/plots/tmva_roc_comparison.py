@@ -76,22 +76,26 @@ def main(args):
     # ROC
     ax0 = plt.subplot(gs[0])
     ax0.plot(eff_ref, rej_ref, c="k", label="Reference")
-    for eff, rej, score, c in zip(eff_add, rej_add, args.add_score, ["r", "b"]):
-        if "subsampling" in score:
-            label="BDT B"
-        else:
-            label="BDT A"
+    for eff, rej, score, c, l in zip(eff_add, rej_add, args.add_score,
+                                     ["r", "b"], ["A", "B"]):
+        label = "BDT {}".format(l)
         ax0.plot(eff, rej, c=c, label=label)
 
     ax0.set_yscale("log")
-    ax0.set_ylim(1, 1e4)
+    if not args.mode3p:
+        ax0.set_ylim(1, 1e4)
+    else:
+        ax0.set_ylim(1, 1e4)
     ax0.set_ylabel("Rejection", ha="right", y=1.0)
     ax0.tick_params(labelbottom="off")
     ax0.legend()
 
     # Ratio
     xfull = np.linspace(0.0, 1.0, 10)
-    x = np.linspace(0.1, 1.0, 200)
+    if not args.mode3p:
+        x = np.linspace(0.1, 1.0, 200)
+    else:
+        x = np.linspace(0.2, 1.0, 200)
 
     ax1 = plt.subplot(gs[1], sharex=ax0)
     ax1.plot(xfull, np.ones_like(xfull), c="k", label="Reference")
@@ -100,18 +104,17 @@ def main(args):
         ax1.plot(x, roc_interp(x) / roc_interp_ref(x), c=c)
 
     ax1.set_xlabel("Signal efficiency", ha="right", x=1.0)
-    ax1.set_ylabel("Ratio", ha="right", y=1.0)
+    ax1.set_ylabel("Ratio")
 
     ylim = ax1.get_ylim()
-    ax1.set_ylim(0.9, 1.5)
-    ax1.set_yticks([1.0, 1.2, 1.4])
+    if not args.mode3p:
+        ax1.set_ylim(0.9, 1.5)
+        ax1.set_yticks([1.0, 1.2, 1.4])
+    else:
+        ax1.set_ylim(0.95, 1.3)
+        ax1.set_yticks([1.0, 1.1, 1.2])
 
     fig.savefig(args.outfile)
-
-    #e41a1c
-    #377eb8
-    #4daf4a
-    #984ea3
 
 
 if __name__ == "__main__":
@@ -121,6 +124,7 @@ if __name__ == "__main__":
     parser.add_argument("ref_score")
     parser.add_argument("add_score", nargs="*")
     parser.add_argument("-o", dest="outfile", default="roc_comparison.pdf")
+    parser.add_argument("--mode3p", action="store_true")
 
     args = parser.parse_args()
     main(args)
