@@ -1,13 +1,14 @@
 import argparse
 
 import numpy as np
+from tqdm import tqdm
 
 import matplotlib as mpl
 mpl.use("PDF")
 
 import matplotlib.pyplot as plt
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup(scale=0.48, pad_left=0.18)
+mpl_setup(scale=0.48, pad_left=0.18, pad_bottom=0.12, aspect_ratio=1.0)
 
 from rnn_tauid.evaluation.misc import binned_efficiency, bin_center, bin_width
 from rnn_tauid.evaluation.flattener import Flattener
@@ -33,13 +34,18 @@ def main(args):
             sig["TauJets.pt"][sig["TauJets.pt"] < 1000 * args.pt_max],
             np.linspace(0, 100, args.bins + 1))
 
+    bin_midpoint = bin_center(bins)
+    bin_half_width = bin_width(bins) / 2.0
+
     rej = {}
     d_rej = {}
+    flatteners = {}
 
     for score in scores:
         # Calculate working point
         flat = Flattener(binnings.pt_flat, binnings.mu_flat, args.eff)
         sig_pass_thr = flat.fit(sig["TauJets.pt"], sig["TauJets.mu"], sig[score])
+        flatteners[score] = flat
 
         # Check if flattening meets efficiency goal
         assert np.isclose(np.count_nonzero(sig_pass_thr) / float(len(sig_pass_thr)),
@@ -48,8 +54,6 @@ def main(args):
         # Background events passing working point
         bkg_pass_thr = flat.passes_thr(bkg["TauJets.pt"], bkg["TauJets.mu"],
                                        bkg[score])
-        bin_midpoint = bin_center(bins)
-        bin_half_width = bin_width(bins) / 2.0
 
         # Background efficiency & rejection
         bkg_eff = binned_efficiency(bkg["TauJets.pt"], bkg_pass_thr, bins=bins)
@@ -59,9 +63,52 @@ def main(args):
         rej[score] = bkg_rej
         d_rej[score] = d_bkg_rej
 
-    # Plotting
-    fig, ax = plt.subplots()
 
+    ratio = {}
+    # Bootstrap the ratio
+    n_bootstrap = 50
+    for score in tqdm(scores[1:]):
+        ratio[score] = []
+
+        for i in tqdm(range(n_bootstrap)):
+            idx = np.random.randint(len(bkg), size=len(bkg))
+            bootstrap = bkg[idx]
+
+            # Reference
+            flat_ref = flatteners[scores[0]]
+            bkg_pass_thr_ref = flat_ref.passes_thr(bootstrap["TauJets.pt"],
+                                                   bootstrap["TauJets.mu"],
+                                                   bootstrap[scores[0]])
+            bkg_eff_ref = binned_efficiency(bootstrap["TauJets.pt"],
+                                            bkg_pass_thr_ref,
+                                            bins=bins)
+            bkg_rej_ref = 1.0 / bkg_eff_ref.mean
+
+            # To compare
+            flat = flatteners[score]
+            bkg_pass_thr = flat.passes_thr(bootstrap["TauJets.pt"],
+                                           bootstrap["TauJets.mu"],
+                                           bootstrap[score])
+
+            # Background efficiency & rejection
+            bkg_eff = binned_efficiency(bootstrap["TauJets.pt"], bkg_pass_thr,
+                                        bins=bins)
+            bkg_rej = 1.0 / bkg_eff.mean
+
+            ratio[score].append(bkg_rej / bkg_rej_ref)
+
+    ratio_mean = {}
+    ratio_std = {}
+    for key in ratio:
+        r = np.array(ratio[key])
+        ratio_mean[key] = r.mean(axis=0)
+        ratio_std[key] = r.std(axis=0)
+
+    # Plotting
+    fig = plt.figure()
+    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1], hspace=0.08)
+
+    ax = plt.subplot(gs[0])
     for score, label, color, zorder in zip(scores,
                                            ["Reference", "BDT A", "BDT B"],
                                            ["k", "r", "b"], [-3, -2, -1]):
@@ -70,17 +117,27 @@ def main(args):
                     fmt="o", c=color, zorder=zorder, label=label)
 
     ax.set_xlim(20, args.pt_max)
-    ax.set_xlabel(r"Reconstructed tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
     ax.set_ylabel("Rejection", ha="right", y=1.0)
 
+    # Ratio plot
+    ax1 = plt.subplot(gs[1], sharex=ax)
+    ref_score, cmp_scores = scores[0], scores[1:]
 
-    # Prepend 20 GeV tick if it does not exist
-    # xticks = ax.get_xticks()
-    # if not xticks[0] == 20.0:
-    #     ax.set_xticks([20] + list(xticks))
+    for score, color, zorder in zip(cmp_scores, ["r", "b"], [-2, -1]):
+        ax1.errorbar(bin_midpoint / 1000.0, ratio_mean[score],
+                     xerr=bin_half_width / 1000.0, yerr=ratio_std[score],
+                     fmt="o", c=color, zorder=zorder)
+
+    ax1.set_ylabel("Ratio")
+    ax.tick_params(labelbottom="off")
+    ax1.set_xlabel(r"Reconstructed tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
 
     if args.ylim:
         ax.set_ylim(*args.ylim)
+
+    if args.ylim_ratio:
+        ax1.set_ylim(*args.ylim_ratio)
+        ax1.set_yticks([1.0, 1.1, 1.2, 1.3])
 
     if args.y_zero:
         ylim = ax.get_ylim()
@@ -107,6 +164,7 @@ if __name__ == "__main__":
     parser.add_argument("--pt-max", type=float, default=300)
     parser.add_argument("--y-zero", action="store_true")
     parser.add_argument("--ylim", nargs=2, type=float, default=None)
+    parser.add_argument("--ylim-ratio", nargs=2, type=float, default=None)
     parser.add_argument("--xticks", nargs="+", type=float, default=None)
     parser.add_argument("-o", dest="outfile", default="rej.pdf")
 

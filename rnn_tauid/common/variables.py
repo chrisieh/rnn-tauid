@@ -325,18 +325,18 @@ charged_pfo_vars = [
     ("TauJets/charged_Phi", charged_Phi, partial(constant_scale, scale=np.pi)),
     ("TauJets/charged_Eta", charged_Eta, partial(constant_scale, scale=2.5)),
     ("TauJets/charged_Pt_jet_log", charged_Pt_jet_log, scale),
-    ("TauPFOs/charged_dPhi", charged_dPhi, scale),
-    ("TauPFOs/charged_dEta", charged_dEta, scale),
-    ("TauPFOs/charged_Pt_log", charged_Pt_log, scale)
+    ("TauPFOs/charged_dPhi", charged_dPhi, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/charged_dEta", charged_dEta, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/charged_Pt_log", charged_Pt_log, partial(scale, per_obj=False))
 ]
 
 neutral_pfo_vars = [
     ("TauJets/neutral_Phi", neutral_Phi, partial(constant_scale, scale=np.pi)),
     ("TauJets/neutral_Eta", neutral_Eta, partial(constant_scale, scale=2.5)),
     ("TauJets/neutral_Pt_jet_log", neutral_Pt_jet_log, scale),
-    ("TauPFOs/neutral_dPhi", neutral_dPhi, scale),
-    ("TauPFOs/neutral_dEta", neutral_dEta, scale),
-    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, scale),
+    ("TauPFOs/neutral_dPhi", neutral_dPhi, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_dEta", neutral_dEta, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, partial(scale, per_obj=False)),
     ("TauPFOs/neutralPi0BDT", None, None),
     ("TauPFOs/neutralNHitsInEM1", None, None)
 ]
