@@ -89,8 +89,8 @@ def main(args):
     ax.set_yticklabels(ticklabels[::-1])
     ax.get_yaxis().set_ticks_position("left")
 
-    ax.set_xlabel("True Decay Mode", ha="right", x=1.0)
-    ax.set_ylabel("Reconstructed Decay Mode", ha="right", y=1.0)
+    ax.set_xlabel("True decay mode", ha="right", x=1.0)
+    ax.set_ylabel("Reconstructed decay mode", ha="right", y=1.0)
 
     # Set values on plot
     for i, j in product(range(cm.shape[0]), range(cm.shape[0])):
