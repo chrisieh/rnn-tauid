@@ -125,7 +125,13 @@ def Eta(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedEta"
     datafile[var].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
 
-    eta = datafile["TauJets/Eta"]
+    if "TauJets/Eta" in datafile:
+        eta = datafile["TauJets/Eta"]
+    elif "TauJets/eta" in datafile:
+        eta = datafile["TauJets/eta"]
+    else:
+        raise KeyError("TauJets/[Ee]ta not found in sample")
+
     np.add(dest[dest_sel], eta[source_sel[0]][:, np.newaxis], out=dest[dest_sel])
 
 
@@ -135,7 +141,13 @@ def Phi(datafile, dest, source_sel=None, dest_sel=None, var="TauPFOs/chargedPhi"
                                                           dest_sel=dest_sel)
     np.multiply(dest[dest_sel], 0, out=dest[dest_sel])
 
-    phi = datafile["TauJets/Phi"]
+    if "TauJets/Phi" in datafile:
+        phi = datafile["TauJets/Phi"]
+    elif "TauJets/phi" in datafile:
+        phi = datafile["TauJets/phi"]
+    else:
+        raise KeyError("TauJets/[Pp]hi not found in sample")
+
     np.add(dest[dest_sel], phi[source_sel[0]][:, np.newaxis], out=dest[dest_sel])
 
 
@@ -200,12 +212,14 @@ def dPhi_extrap(datafile, dest, source_sel=None, dest_sel=None, var="TauConv/phi
 
 
 # Charged & neutral PFOs
+track_Eta = partial(Eta, var="TauTracks/eta")
 charged_Eta = partial(Eta, var="TauPFOs/chargedEta")
 neutral_Eta = partial(Eta, var="TauPFOs/neutralEta")
 shot_Eta = partial(Eta, var="TauPFOs/shotEta")
 hadronic_Eta = partial(Eta, var="TauPFOs/hadronicEta")
 neutral_Eta_bdtsort = partial(Eta, var="TauPFOs/neutralEta_BDTSort")
 
+track_Phi = partial(Phi, var="TauTracks/phi")
 charged_Phi = partial(Phi, var="TauPFOs/chargedPhi")
 neutral_Phi = partial(Phi, var="TauPFOs/neutralPhi")
 shot_Phi = partial(Phi, var="TauPFOs/shotPhi")
@@ -280,12 +294,11 @@ track_vars = [
 
 cluster_vars = [
     ("TauClusters/et_log", et_log, partial(scale, per_obj=False)),
-    ("TauClusters/psfrac", None, None),
-    ("TauClusters/em1frac", None, None),
-    ("TauClusters/em2frac", None, None),
-    ("TauClusters/em3frac", None, None),
-    ("TauClusters/dRJetSeedAxis", None, partial(constant_scale, scale=0.4)),
-    ("TauClusters/EM_PROBABILITY", None, None),
+    ("TauClusters/pt_jetseed_log",
+     partial(Pt_jet_log, var="TauClusters/et", ptvar="TauJets/ptJetSeed"),
+     partial(scale, per_obj=False)),
+    ("TauClusters/dEta", cluster_dEta, partial(constant_scale, scale=0.4)),
+    ("TauClusters/dPhi", cluster_dPhi, partial(constant_scale, scale=0.4)),
     ("TauClusters/SECOND_R", SECOND_R_log, partial(scale, per_obj=False)),
     ("TauClusters/SECOND_LAMBDA", SECOND_LAMBDA_log,
      partial(scale, per_obj=False)),
@@ -345,64 +358,82 @@ neutral_pfo_w_moment_vars = [
     ("TauJets/neutral_Phi", neutral_Phi, partial(constant_scale, scale=np.pi)),
     ("TauJets/neutral_Eta", neutral_Eta, partial(constant_scale, scale=2.5)),
     ("TauJets/neutral_Pt_jet_log", neutral_Pt_jet_log, scale),
-    ("TauPFOs/neutral_dPhi", neutral_dPhi, scale),
-    ("TauPFOs/neutral_dEta", neutral_dEta, scale),
-    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, scale),
+    ("TauPFOs/neutral_dPhi", neutral_dPhi, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_dEta", neutral_dEta, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, partial(scale, per_obj=False)),
     ("TauPFOs/neutralPi0BDT", None, None),
     ("TauPFOs/neutralNHitsInEM1", None, None),
-    ("TauPFOs/neutral_SECOND_R", neutral_SECOND_R_log, scale),
+    ("TauPFOs/neutral_SECOND_R", neutral_SECOND_R_log,
+     partial(scale, per_obj=False)),
     ("TauPFOs/neutral_secondEtaWRTClusterPosition_EM1",
-     neutral_secondEtaWRTClusterPosition_EM1_log, scale),
-    ("TauPFOs/neutral_NPosECells_EM1", None, scale),
+     neutral_secondEtaWRTClusterPosition_EM1_log,
+     partial(scale, per_obj=False)),
+    ("TauPFOs/neutral_NPosECells_EM1", None, partial(scale, per_obj=False)),
     ("TauPFOs/neutral_ENG_FRAC_CORE", None, None),
     ("TauPFOs/neutral_energyfrac_EM2", None, None)
 ]
 
 neutral_pfo_bdtsort_vars = [
-    ("TauJets/neutral_Phi_BDTSort", neutral_Phi_bdtsort,
+    ("TauJets/neutral_Phi_BDTSort", neutral_Phi,
      partial(constant_scale, scale=np.pi)),
-    ("TauJets/neutral_Eta_BDTSort", neutral_Eta_bdtsort,
+    ("TauJets/neutral_Eta_BDTSort", neutral_Eta,
      partial(constant_scale, scale=2.5)),
-    ("TauJets/neutral_Pt_jet_log_BDTSort", neutral_Pt_jet_log_bdtsort, scale),
-    ("TauPFOs/neutral_dPhi_BDTSort", neutral_dPhi_bdtsort, scale),
-    ("TauPFOs/neutral_dEta_BDTSort", neutral_dEta_bdtsort, scale),
-    ("TauPFOs/neutral_Pt_log_BDTSort", neutral_Pt_log_bdtsort, scale),
+    ("TauJets/neutral_Pt_jet_log_BDTSort", neutral_Pt_jet_log, scale),
+    ("TauPFOs/neutral_dPhi_BDTSort", neutral_dPhi,
+     partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_dEta_BDTSort", neutral_dEta,
+     partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_Pt_log_BDTSort", neutral_Pt_log,
+     partial(scale, per_obj=False)),
     ("TauPFOs/neutralPi0BDT_BDTSort", None, None),
     ("TauPFOs/neutralNHitsInEM1_BDTSort", None, None)
 ]
 
 conversion_vars = [
-    ("TauJets/conversion_Phi", conversion_Phi, partial(constant_scale, scale=np.pi)),
-    ("TauJets/conversion_Eta", conversion_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/conversion_Phi", conversion_Phi,
+     partial(constant_scale, scale=np.pi)),
+    ("TauJets/conversion_Eta", conversion_Eta,
+     partial(constant_scale, scale=2.5)),
     ("TauJets/conversion_Pt_jet_log", conversion_Pt_jet_log, scale),
-    ("TauConv/conversion_dPhi", conversion_dPhi, scale),
-    ("TauConv/conversion_dEta", conversion_dEta, scale),
-    ("TauConv/conversion_Pt_log", conversion_Pt_log, scale)
+    ("TauConv/conversion_dPhi", conversion_dPhi,
+     partial(constant_scale, scale=0.4)),
+    ("TauConv/conversion_dEta", conversion_dEta,
+     partial(constant_scale, scale=0.4)),
+    ("TauConv/conversion_Pt_log", conversion_Pt_log,
+     partial(scale, per_obj=False))
 ]
 
 conversion_extrapol_vars = [
-    ("TauJets/conversion_Phi", conversion_Phi, partial(constant_scale, scale=np.pi)),
-    ("TauJets/conversion_Eta", conversion_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/conversion_Phi", conversion_Phi,
+     partial(constant_scale, scale=np.pi)),
+    ("TauJets/conversion_Eta", conversion_Eta,
+     partial(constant_scale, scale=2.5)),
     ("TauJets/conversion_Pt_jet_log", conversion_Pt_jet_log, scale),
-    ("TauConv/conversion_dPhi_extrap", dPhi_extrap, scale),
-    ("TauConv/conversion_dEta_extrap", dEta_extrap, scale),
-    ("TauConv/conversion_Pt_log", conversion_Pt_log, scale)
+    ("TauConv/conversion_dPhi_extrap", dPhi_extrap,
+     partial(constant_scale, scale=0.4)),
+    ("TauConv/conversion_dEta_extrap", dEta_extrap,
+     partial(constant_scale, scale=0.4)),
+    ("TauConv/conversion_Pt_log", conversion_Pt_log,
+     partial(scale, per_obj=False))
 ]
 
 shot_vars = [
     ("TauJets/shot_Phi", shot_Phi, partial(constant_scale, scale=np.pi)),
     ("TauJets/shot_Eta", shot_Eta, partial(constant_scale, scale=2.5)),
     ("TauJets/shot_Pt_jet_log", shot_Pt_jet_log, scale),
-    ("TauPFOs/shot_dPhi", shot_dPhi, scale),
-    ("TauPFOs/shot_dEta", shot_dEta, scale),
-    ("TauPFOs/shot_Pt_log", shot_Pt_log, scale)
+    ("TauPFOs/shot_dPhi", shot_dPhi, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/shot_dEta", shot_dEta, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/shot_Pt_log", shot_Pt_log, partial(scale, per_obj=False))
 ]
 
 hadr_vars = [
-    ("TauJets/hadronic_Phi", hadronic_Phi, partial(constant_scale, scale=np.pi)),
-    ("TauJets/hadronic_Eta", hadronic_Eta, partial(constant_scale, scale=2.50)),
+    ("TauJets/hadronic_Phi", hadronic_Phi,
+     partial(constant_scale, scale=np.pi)),
+    ("TauJets/hadronic_Eta", hadronic_Eta, partial(constant_scale, scale=2.5)),
     ("TauJets/hadronic_Pt_jet_log", hadronic_Pt_jet_log, scale),
-    ("TauPFOs/hadronic_dPhi", hadronic_dPhi, scale),
-    ("TauPFOs/hadronic_dEta", hadronic_dEta, scale),
-    ("TauPFOs/hadronic_Pt_log", hadronic_Pt_log, scale)
+    ("TauPFOs/hadronic_dPhi", hadronic_dPhi,
+     partial(constant_scale, scale=0.4)),
+    ("TauPFOs/hadronic_dEta", hadronic_dEta,
+     partial(constant_scale, scale=0.4)),
+    ("TauPFOs/hadronic_Pt_log", hadronic_Pt_log, partial(scale, per_obj=False))
 ]

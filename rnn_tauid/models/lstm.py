@@ -133,6 +133,40 @@ def lstm_bidirectional(input_shape, dense_units=8, lstm_units=64,
     return Model(input=x, output=y)
 
 
+def lstm_bidirectional_stacked(input_shape, dense_units=32, lstm_units_1=24,
+                               lstm_units_2=24, mask_value=0.0, unroll=True):
+    """
+    Recurrent neural network with shared weights at input and a single LSTM
+    layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units : int
+        Number of units of the dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
+    bidirectional_lstm_1 = Bidirectional(
+        LSTM(output_dim=lstm_units_1, unroll=unroll, return_sequences=True))(
+            shared_dense)
+    bidirectional_lstm_2 = Bidirectional(
+        LSTM(output_dim=lstm_units_2, unroll=unroll))(
+            bidirectional_lstm_1)
+    y = Dense(1, activation="sigmoid")(bidirectional_lstm_2)
+
+    return Model(input=x, output=y)
+
+
 def lstm_shared_ffnn(input_shape, dense_units_1=32, dense_units_2=32,
                      lstm_units=32, backwards=False, mask_value=0.0,
                      unroll=True):
@@ -238,5 +272,38 @@ def lstm_batch_norm(input_shape, dense_units=8, lstm_units=64,
     bn = BatchNormalization()(shared_dense)
     lstm = LSTM(output_dim=lstm_units, unroll=unroll, go_backwards=backwards)(bn)
     y = Dense(1, activation="sigmoid")(lstm)
+
+    return Model(input=x, output=y)
+
+
+def stacked_lstm_shared_weights(input_shape, dense_units=8, lstm_units_1=64,
+                                lstm_units_2=64, backwards=False,
+                                mask_value=0.0, unroll=True):
+    """
+    Recurrent neural network with shared weights at input and a single LSTM
+    layer
+
+    Parameters:
+    -----------
+    input_shape : tuple (timesteps, variables per timestep)
+        Shape of the input.
+    dense_units : int
+        Number of units of the dense layer with shared weights.
+    lstm_units : int
+        Number of units in the LSTM layer.
+
+    Returns:
+    --------
+    model : keras-model
+        The trainable model.
+    """
+    x = Input(shape=input_shape)
+    mask = Masking(mask_value=mask_value)(x)
+    shared_dense = TimeDistributed(Dense(dense_units, activation="tanh"))(mask)
+    lstm_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
+                  go_backwards=backwards, return_sequences=True)(shared_dense)
+    lstm_2 = LSTM(output_dim=lstm_units_2, unroll=unroll,
+                  go_backwards=backwards)(lstm_1)
+    y = Dense(1, activation="sigmoid")(lstm_2)
 
     return Model(input=x, output=y)

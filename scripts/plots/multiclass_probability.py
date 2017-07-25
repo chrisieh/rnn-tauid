@@ -44,7 +44,7 @@ def main(args):
 
             ax.hist(proba[label2][:, i], bins=40, range=(0, 1), normed=True,
                     histtype="step", color=c, label=texlabel2)
-            ax.set_ylim(0, 8)
+            ax.set_ylim(0, 10)
             ax.legend(loc="upper center", title="True decay mode:")
 
         fig.savefig("_".join([args.o, label1]) + ".pdf")

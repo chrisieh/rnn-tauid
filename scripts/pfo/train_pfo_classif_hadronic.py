@@ -60,6 +60,15 @@ def main(args):
         neut_data = load_data_pfo(data, np.s_[:idx], invars_neut, num=args.num_neut)
         hadr_data = load_data_pfo(data, np.s_[:idx], invars_hadr, num=args.num_hadr)
 
+        # Apply pt cut on neutral pfos
+        if args.neut_pt_cut:
+            pt_col = neut_vars.index("TauPFOs/neutral_Pt_log")
+            neut_pfo_pt = neut_data.x[:, :, pt_col]
+            pt_fail = neut_pfo_pt < np.log10(1000 * args.neut_pt_cut)
+            neut_data.x[pt_fail] = np.nan
+
+            del pt_col, neut_pfo_pt, pt_fail
+
         # Mask the nTracks selection
         from collections import namedtuple
         Data = namedtuple("Data", ["x", "y", "w"])
@@ -150,6 +159,7 @@ if __name__ == "__main__":
     parser.add_argument("--num-chrg", default=3)
     parser.add_argument("--num-neut", default=10)
     parser.add_argument("--num-hadr", default=5)
+    parser.add_argument("--neut-pt-cut", type=float, default=0)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--epochs", type=int, default=100)

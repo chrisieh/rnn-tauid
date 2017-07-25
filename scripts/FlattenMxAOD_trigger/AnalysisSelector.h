@@ -47,9 +47,9 @@ class AnalysisSelector : public TSelector
     // TauJets variables
     TRA_int reader_nTracks = {fReader, "TauJetsAuxDyn.nTracks"};
     TRA_float reader_pt = {fReader, "TauJetsAuxDyn.pt"};
-    /* TRA_float reader_ptJetSeed = {fReader, "TauJetsAuxDyn.trk_ptJetSeed"}; */
-    /* TRA_float reader_etaJetSeed = {fReader, "TauJetsAuxDyn.trk_etaJetSeed"}; */
-    /* TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"}; */
+    TRA_float reader_ptJetSeed = {fReader, "TauJetsAuxDyn.trk_ptJetSeed"};
+    TRA_float reader_etaJetSeed = {fReader, "TauJetsAuxDyn.trk_etaJetSeed"};
+    TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"};
     TRA_float reader_eta = {fReader, "TauJetsAuxDyn.eta"};
     TRA_float reader_phi = {fReader, "TauJetsAuxDyn.phi"};
 

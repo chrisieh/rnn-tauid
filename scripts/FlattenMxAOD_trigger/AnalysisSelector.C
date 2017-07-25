@@ -67,12 +67,12 @@ void AnalysisSelector::Begin(TTree * /*tree*/)
         "TauJets.phi", &v_phi, "TauJets.phi/F");
     b_nTracks = fOutTree->Branch(
         "TauJets.nTracks", &v_nTracks, "TauJets.nTracks/I");
-    // b_ptJetSeed = fOutTree->Branch(
-    //     "TauJets.ptJetSeed", &v_ptJetSeed, "TauJets.ptJetSeed/F");
-    // b_etaJetSeed = fOutTree->Branch(
-    //     "TauJets.etaJetSeed", &v_etaJetSeed, "TauJets.etaJetSeed/F");
-    // b_phiJetSeed = fOutTree->Branch(
-    //     "TauJets.phiJetSeed", &v_phiJetSeed, "TauJets.phiJetSeed/F");
+    b_ptJetSeed = fOutTree->Branch(
+        "TauJets.ptJetSeed", &v_ptJetSeed, "TauJets.ptJetSeed/F");
+    b_etaJetSeed = fOutTree->Branch(
+        "TauJets.etaJetSeed", &v_etaJetSeed, "TauJets.etaJetSeed/F");
+    b_phiJetSeed = fOutTree->Branch(
+        "TauJets.phiJetSeed", &v_phiJetSeed, "TauJets.phiJetSeed/F");
     b_mu = fOutTree->Branch(
         "TauJets.mu", &v_mu, "TauJets.mu/D");
     b_nVtxPU = fOutTree->Branch(
@@ -287,9 +287,9 @@ Bool_t AnalysisSelector::Process(Long64_t entry)
         v_eta = reader_eta[itau];
         v_phi = reader_phi[itau];
         v_nTracks = reader_nTracks[itau];
-        // v_ptJetSeed = reader_ptJetSeed[itau];
-        // v_etaJetSeed = reader_etaJetSeed[itau];
-        // v_phiJetSeed = reader_phiJetSeed[itau];
+        v_ptJetSeed = reader_ptJetSeed[itau];
+        v_etaJetSeed = reader_etaJetSeed[itau];
+        v_phiJetSeed = reader_phiJetSeed[itau];
         v_mu = reader_mu[itau];
         v_nVtxPU = reader_nVtxPU[itau];
         v_centFrac = reader_centFrac[itau];
