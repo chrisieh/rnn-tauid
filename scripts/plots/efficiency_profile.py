@@ -6,7 +6,7 @@ import h5py
 import matplotlib as mpl
 mpl.use("PDF")
 from rnn_tauid.common.mpl_setup import mpl_setup
-mpl_setup()
+mpl_setup(scale=0.48)
 import matplotlib.pyplot as plt
 
 from rnn_tauid.evaluation.misc import binned_efficiency, bin_center, bin_width
@@ -34,14 +34,16 @@ def main(args):
     if args.highpt:
         pt_bins = np.logspace(np.log10(100.0), np.log10(1000.0), 21)
     else:
-        pt_bins = np.linspace(20.0, 100.0, 33)
+        pt_bins = np.linspace(20.0, 100.0, 25)
 
     pt_bin_center = bin_center(pt_bins)
     pt_bin_halfwidth = 0.5 * bin_width(pt_bins)
 
     fig, ax = plt.subplots()
 
-    for i, mode in enumerate(["1p0n", "1p1n", "1pXn", "3p0n", "3pXn"]):
+    for i, mode in enumerate([r"$h^\pm$", r"$h^\pm \pi^0$",
+                              r"$h^\pm \geq 2 \pi^0$", r"$3 h^\pm$",
+                              r"$3 h^\pm \geq 1 \pi^0$"]):
         if args.purity:
             is_mode = pred == i
             passes = truth[is_mode] == i
@@ -57,18 +59,18 @@ def main(args):
                     xerr=pt_bin_halfwidth, yerr=eff.std,
                     fmt="o", label=mode)
 
-    ax.legend(ncol=2)
+    ax.legend(ncol=2, columnspacing=0.1)
 
     if args.purity:
-        ax.set_ylim(0.5, 1.0)
+        ax.set_ylim(0.68, 0.93)
     elif args.highpt:
         ax.set_ylim(0.0, 1.0)
     else:
         lo, hi = ax.get_ylim()
         # ax.set_ylim(lo, 1.0)
-        ax.set_ylim(0.3, 1.0)
+        ax.set_ylim(0.4, 1.0)
 
-    ax.set_xlabel(r"Reco Tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
+    ax.set_xlabel(r"Reconstructed tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
 
     if args.purity:
         ax.set_ylabel(r"Purity", ha="right", y=1.0)

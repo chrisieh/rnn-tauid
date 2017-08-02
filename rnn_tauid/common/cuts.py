@@ -54,9 +54,12 @@ sel_truth_Xp_pfo = and_cuts([baseline, ptLess100, ptLess100Truth,
                              noExtendedDecayMode])
 sel_truth_Xp_highpt_pfo = and_cuts([baseline, ptGreater100, ptGreater100Truth,
                                     noExtendedDecayMode])
+sel_truth_1p3p_pfo_noptcut = and_cuts([baseline, noExtendedDecayMode,
+                                       mode1P3PNoTruth])
 
 sel_dict = {"truth1p": sel_truth_1p, "1p": sel_1p,
             "truth3p": sel_truth_3p, "3p": sel_3p,
             "truthXp": sel_truth_Xp, "Xp": sel_Xp,
             "PFO1P": sel_truth_1p_pfo, "PFO3P": sel_truth_3p_pfo,
-            "PFOXP": sel_truth_Xp_pfo, "PFOXPHighPt": sel_truth_Xp_highpt_pfo}
+            "PFOXP": sel_truth_Xp_pfo, "PFOXPHighPt": sel_truth_Xp_highpt_pfo,
+            "PFO1P3P_NOPTCUT": sel_truth_1p3p_pfo_noptcut}

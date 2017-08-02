@@ -78,6 +78,11 @@ def main(args):
             src_conv = np.s_[start:stop, :num_conv]
             lslice = stop - start
 
+            # Select neutrals passing pt cut
+            if args.neut_pt_cut:
+                neut_pt = data["TauPFOs/neutralPt"][src_neut]
+                pt_fail = neut_pt < 1000 * args.neut_pt_cut
+
             for i, (varname, func, _) in enumerate(invars_chrg):
                 dest = np.s_[:lslice, ..., i]
                 if func:
@@ -108,6 +113,10 @@ def main(args):
                 x_conv[dest] -= conv_offset[varname]
                 x_conv[dest] /= conv_scale[varname]
 
+            # Apply pt cut to neutrals
+            if args.neut_pt_cut:
+                x_neut[:lslice][pt_fail] = np.nan
+
             # Replace nans
             x_chrg[np.isnan(x_chrg)] = 0
             x_neut[np.isnan(x_neut)] = 0
@@ -134,6 +143,7 @@ if __name__ == "__main__":
     parser.add_argument("--v-neut", dest="neut_var", default=None)
     parser.add_argument("--v-conv", dest="conv_var", default=None)
     parser.add_argument("-o", dest="outfile", default="pred.h5")
+    parser.add_argument("--neut-pt-cut", type=float, default=0)
 
     args = parser.parse_args()
     main(args)

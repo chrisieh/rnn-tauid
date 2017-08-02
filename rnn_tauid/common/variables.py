@@ -186,6 +186,13 @@ def PtSubRatio(datafile, dest, source_sel=None, dest_sel=None):
     np.add(pt, dest[dest_sel], out=pt)
     np.divide(dest[dest_sel], pt, out=dest[dest_sel])
 
+def PtSubRatio_2(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauPFOs/neutralPtSub"].read_direct(dest, source_sel=source_sel,
+                                                 dest_sel=dest_sel)
+    denom = datafile["TauPFOs/neutralPt"][source_sel]
+    np.add(dest[dest_sel], denom, out=denom)
+    np.divide(dest[dest_sel], denom, out=dest[dest_sel])
+
 # dPhi, dEta for extrapolated conversion tracks
 
 def dEta_extrap(datafile, dest, source_sel=None, dest_sel=None, var="TauConv/eta_extrap"):
@@ -373,17 +380,38 @@ neutral_pfo_w_moment_vars = [
     ("TauPFOs/neutral_energyfrac_EM2", None, None)
 ]
 
+neutral_pfo_w_moment_sub_e_vars = [
+    ("TauJets/neutral_Phi", neutral_Phi, partial(constant_scale, scale=np.pi)),
+    ("TauJets/neutral_Eta", neutral_Eta, partial(constant_scale, scale=2.5)),
+    ("TauJets/neutral_Pt_jet_log", neutral_Pt_jet_log, scale),
+    ("TauPFOs/neutral_dPhi", neutral_dPhi, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_dEta", neutral_dEta, partial(constant_scale, scale=0.4)),
+    ("TauPFOs/neutral_Pt_log", neutral_Pt_log, partial(scale, per_obj=False)),
+    ("TauPFOs/neutralPi0BDT", None, None),
+    ("TauPFOs/neutralNHitsInEM1", None, None),
+    ("TauPFOs/neutral_SECOND_R", neutral_SECOND_R_log,
+     partial(scale, per_obj=False)),
+    ("TauPFOs/neutral_secondEtaWRTClusterPosition_EM1",
+     neutral_secondEtaWRTClusterPosition_EM1_log,
+     partial(scale, per_obj=False)),
+    ("TauPFOs/neutral_NPosECells_EM1", None, partial(scale, per_obj=False)),
+    ("TauPFOs/neutral_ENG_FRAC_CORE", None, None),
+    ("TauPFOs/neutral_energyfrac_EM2", None, None),
+    ("TauPFOs/neutral_PtSubRatio", PtSubRatio_2, None)
+]
+
+
 neutral_pfo_bdtsort_vars = [
-    ("TauJets/neutral_Phi_BDTSort", neutral_Phi,
+    ("TauJets/neutral_Phi_BDTSort", neutral_Phi_bdtsort,
      partial(constant_scale, scale=np.pi)),
-    ("TauJets/neutral_Eta_BDTSort", neutral_Eta,
+    ("TauJets/neutral_Eta_BDTSort", neutral_Eta_bdtsort,
      partial(constant_scale, scale=2.5)),
-    ("TauJets/neutral_Pt_jet_log_BDTSort", neutral_Pt_jet_log, scale),
-    ("TauPFOs/neutral_dPhi_BDTSort", neutral_dPhi,
+    ("TauJets/neutral_Pt_jet_log_BDTSort", neutral_Pt_jet_log_bdtsort, scale),
+    ("TauPFOs/neutral_dPhi_BDTSort", neutral_dPhi_bdtsort,
      partial(constant_scale, scale=0.4)),
-    ("TauPFOs/neutral_dEta_BDTSort", neutral_dEta,
+    ("TauPFOs/neutral_dEta_BDTSort", neutral_dEta_bdtsort,
      partial(constant_scale, scale=0.4)),
-    ("TauPFOs/neutral_Pt_log_BDTSort", neutral_Pt_log,
+    ("TauPFOs/neutral_Pt_log_BDTSort", neutral_Pt_log_bdtsort,
      partial(scale, per_obj=False)),
     ("TauPFOs/neutralPi0BDT_BDTSort", None, None),
     ("TauPFOs/neutralNHitsInEM1_BDTSort", None, None)

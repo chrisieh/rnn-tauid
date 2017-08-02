@@ -76,6 +76,11 @@ def main(args):
             src_shot = np.s_[start:stop, :num_shot]
             lslice = stop - start
 
+            # Select neutrals passing pt cut
+            if args.neut_pt_cut:
+                neut_pt = data["TauPFOs/neutralPt"][src_neut]
+                pt_fail = neut_pt < 1000 * args.neut_pt_cut
+
             for i, (varname, func, _) in enumerate(invars_chrg):
                 dest = np.s_[:lslice, ..., i]
                 if func:
@@ -106,6 +111,10 @@ def main(args):
                 x_shot[dest] -= shot_offset[varname]
                 x_shot[dest] /= shot_scale[varname]
 
+            # Apply pt cut to neutrals
+            if args.neut_pt_cut:
+                x_neut[:lslice][pt_fail] = np.nan
+
             # Replace nans
             x_chrg[np.isnan(x_chrg)] = 0
             x_neut[np.isnan(x_neut)] = 0
@@ -132,6 +141,7 @@ if __name__ == "__main__":
     parser.add_argument("--v-neut", dest="neut_var", default=None)
     parser.add_argument("--v-shot", dest="shot_var", default=None)
     parser.add_argument("-o", dest="outfile", default="pred.h5")
+    parser.add_argument("--neut-pt-cut", type=float, default=0)
 
     args = parser.parse_args()
     main(args)
