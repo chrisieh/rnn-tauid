@@ -32,7 +32,7 @@ def main(args):
             pred = np.argmax(pred, axis=1)
 
     if args.highpt:
-        pt_bins = np.logspace(np.log10(100.0), np.log10(1000.0), 21)
+        pt_bins = np.linspace(20.0, 250.0, 25) #np.logspace(np.log10(100.0), np.log10(1000.0), 21)
     else:
         pt_bins = np.linspace(20.0, 100.0, 25)
 
@@ -64,11 +64,14 @@ def main(args):
     if args.purity:
         ax.set_ylim(0.68, 0.93)
     elif args.highpt:
-        ax.set_ylim(0.0, 1.0)
+        ax.set_ylim(0.4, 1.0)
     else:
         lo, hi = ax.get_ylim()
         # ax.set_ylim(lo, 1.0)
         ax.set_ylim(0.4, 1.0)
+
+    if args.purity and args.highpt:
+        ax.set_ylim(0.65, 0.93)
 
     ax.set_xlabel(r"Reconstructed tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
 

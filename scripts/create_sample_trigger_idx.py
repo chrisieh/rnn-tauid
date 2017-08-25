@@ -60,23 +60,20 @@ if __name__ == "__main__":
         n_events = None
         seed = 1234567890
 
+        skip_conv = set(["TauJets.mcEventNumber", "TauJets.eventIndex"])
+
         # Jet
         for br in tqdm(jet_branches, desc="Jets"):
             data = root2array(args.infiles, treename=treename, branches=br,
                               selection=sel)
-            data = data.astype(np.float32)
 
-            # Check if same number of events and shuffle
-            if n_events:
-                assert n_events == len(data)
+            if br not in skip_conv:
+                data = data.astype(np.float32)
+                outf.create_dataset("{}/{}".format(*br.split(".")), data=data,
+                                    dtype=np.float32, **h5opt)
             else:
-                n_events = len(data)
-
-            random_state = np.random.RandomState(seed=seed)
-            random_state.shuffle(data)
-
-            outf.create_dataset("{}/{}".format(*br.split(".")), data=data,
-                                dtype=np.float32, **h5opt)
+                outf.create_dataset("{}/{}".format(*br.split(".")), data=data,
+                                    **h5opt)
 
         # Cluster
         mask = root2array(args.infiles, treename=treename,
@@ -92,15 +89,6 @@ if __name__ == "__main__":
 
             # Set nan
             data[mask] = np.nan
-
-            # Check if same number of events and shuffle
-            if n_events:
-                assert n_events == len(data)
-            else:
-                n_events = len(data)
-
-            random_state = np.random.RandomState(seed=seed)
-            random_state.shuffle(data)
 
             outf.create_dataset("{}/{}".format(*br.split(".")),
                                 data=data, dtype=np.float32, **h5opt)

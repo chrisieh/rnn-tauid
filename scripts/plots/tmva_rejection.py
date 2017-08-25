@@ -66,7 +66,7 @@ def main(args):
 
     ratio = {}
     # Bootstrap the ratio
-    n_bootstrap = 50
+    n_bootstrap = args.n_bootstrap
     for score in tqdm(scores[1:]):
         ratio[score] = []
 
@@ -110,7 +110,7 @@ def main(args):
 
     ax = plt.subplot(gs[0])
     for score, label, color, zorder in zip(scores,
-                                           ["Reference", "BDT A", "BDT B"],
+                                           args.labels,
                                            ["k", "r", "b"], [-3, -2, -1]):
         ax.errorbar(bin_midpoint / 1000.0, rej[score],
                     xerr=bin_half_width / 1000.0, yerr=d_rej[score],
@@ -137,7 +137,9 @@ def main(args):
 
     if args.ylim_ratio:
         ax1.set_ylim(*args.ylim_ratio)
-        ax1.set_yticks([1.0, 1.1, 1.2, 1.3])
+
+    if args.yticks_ratio:
+        ax1.set_yticks(args.yticks_ratio)
 
     if args.y_zero:
         ylim = ax.get_ylim()
@@ -166,7 +168,11 @@ if __name__ == "__main__":
     parser.add_argument("--ylim", nargs=2, type=float, default=None)
     parser.add_argument("--ylim-ratio", nargs=2, type=float, default=None)
     parser.add_argument("--xticks", nargs="+", type=float, default=None)
+    parser.add_argument("--yticks-ratio", nargs="+", type=float, default=None)
     parser.add_argument("-o", dest="outfile", default="rej.pdf")
+    parser.add_argument("--labels", nargs="+", default=["Reference",
+                                                        "BDT A", "BDT B"])
+    parser.add_argument("--n-bootstrap", type=int, default=50)
 
     args = parser.parse_args()
     main(args)

@@ -40,16 +40,12 @@ class AnalysisSelector : public TSelector
     TTreeReaderArray<char> *reader_IsTruthMatched = 0;
     TTreeReaderArray<unsigned long> *reader_truthDecayMode = 0;
 
-    // mcEventNumber
-    TTreeReaderArray<unsigned long long> reader_mcEventNumber = {
-        fReader, "TauJetsAuxDyn.mcEventNumber"};
-
     // TauJets variables
     TRA_int reader_nTracks = {fReader, "TauJetsAuxDyn.nTracks"};
     TRA_float reader_pt = {fReader, "TauJetsAuxDyn.pt"};
-    TRA_float reader_ptJetSeed = {fReader, "TauJetsAuxDyn.trk_ptJetSeed"};
-    TRA_float reader_etaJetSeed = {fReader, "TauJetsAuxDyn.trk_etaJetSeed"};
-    TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"};
+    /* TRA_float reader_ptJetSeed = {fReader, "TauJetsAuxDyn.trk_ptJetSeed"}; */
+    /* TRA_float reader_etaJetSeed = {fReader, "TauJetsAuxDyn.trk_etaJetSeed"}; */
+    /* TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"}; */
     TRA_float reader_eta = {fReader, "TauJetsAuxDyn.eta"};
     TRA_float reader_phi = {fReader, "TauJetsAuxDyn.phi"};
 

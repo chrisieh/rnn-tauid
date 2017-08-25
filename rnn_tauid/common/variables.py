@@ -178,7 +178,6 @@ def Pt_jet_log(datafile, dest, source_sel=None, dest_sel=None,
     np.add(dest[dest_sel], np.log10(pt[source_sel[0]])[:, np.newaxis],
            out=dest[dest_sel])
 
-
 def PtSubRatio(datafile, dest, source_sel=None, dest_sel=None):
     datafile["TauPFOs/neutralPtSub"].read_direct(dest, source_sel=source_sel,
                                                  dest_sel=dest_sel)
@@ -281,6 +280,9 @@ track_dEta = partial(dEta, var="TauTracks/eta", refvar="TauJets/eta")
 track_dPhi = partial(dPhi, var="TauTracks/phi", refvar="TauJets/phi")
 cluster_dEta = partial(dEta, var="TauClusters/eta", refvar="TauJets/eta")
 cluster_dPhi = partial(dPhi, var="TauClusters/phi", refvar="TauJets/phi")
+
+# Abs eta
+cluster_abs_eta = partial(abs_var, var="TauClusters/eta")
 
 track_vars = [
     ("TauTracks/pt_log", pt_log, partial(scale, per_obj=False)),
