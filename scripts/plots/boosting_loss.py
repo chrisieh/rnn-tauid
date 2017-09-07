@@ -10,14 +10,14 @@ mpl_setup(scale=0.48)
 
 
 def main(args):
-    margin = np.linspace(-2, 2, 400)
+    margin = np.linspace(-1, 1, 400)
 
     misclass_loss = np.ones_like(margin)
     misclass_loss[margin > 0] = 0
 
     exp_loss = np.exp(-margin)
 
-    binom_loss = np.log(1 + np.exp(-margin)) / np.log(2)
+    binom_loss = np.log(1 + np.exp(-2 * margin)) 
 
     fig, ax = plt.subplots()
     ax.plot(margin, misclass_loss, label="Misclassification loss", c="#999999")
@@ -27,7 +27,7 @@ def main(args):
     ax.set_xlabel("Margin $y \, f(x)$", ha="right", x=1.0)
     ax.set_ylabel("Loss", ha="right", y=1.0)
 
-    ax.set_ylim(0.0, 5.0)
+    ax.set_ylim(0.0, 3.0)
 
     ax.legend()
 

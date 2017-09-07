@@ -145,11 +145,19 @@ def main(args):
         ylim = ax.get_ylim()
         ax.set_ylim(0, ylim[1])
 
+    if args.log_x:
+        ax.set_xscale("log")
+
+
+
     ax.text(0.06, 0.94,
             "{}% signal efficiency working point".format(int(100 * args.eff)),
             va="top", fontsize=7, transform=ax.transAxes)
 
-    ax.legend(loc="lower right")
+    if not args.log_x:
+        ax.legend(loc="lower right")
+    else:
+        ax.legend(loc="center left")
 
     fig.savefig(args.outfile)
 
@@ -164,6 +172,7 @@ if __name__ == "__main__":
     parser.add_argument("--bins", type=int, default=10)
     parser.add_argument("--quantiles", action="store_true")
     parser.add_argument("--pt-max", type=float, default=300)
+    parser.add_argument("--log-x", action="store_true")
     parser.add_argument("--y-zero", action="store_true")
     parser.add_argument("--ylim", nargs=2, type=float, default=None)
     parser.add_argument("--ylim-ratio", nargs=2, type=float, default=None)

@@ -35,7 +35,7 @@ sel = "(TauJets.pt > 20000) && (TMath::Abs(TauJets.eta) < 1.37 || TMath::Abs(Tau
 
 samples = {}
 weights = {}
-sample_names = ["JZ{}W".format(i) for i in range(1, 7)]
+sample_names = ["JZ{}W".format(i) for i in range(1, 2)]
 for sample_name in tqdm(sample_names, desc="Loading samples"):
     path = os.path.join(prefix, sample_name, "*.root")
     samples[sample_name] = root2array(path, treename="CollectionTree",
@@ -56,7 +56,7 @@ oneprong = (nTracks == 1)
 threeprong = (nTracks == 3)
 
 # Setup
-bins = np.linspace(20, 400, 25)
+bins = np.linspace(20, 60, 10)
 bin_midpoint = bin_center(bins)
 bin_half_width = bin_width(bins) / 2.0
 

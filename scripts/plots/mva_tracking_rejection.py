@@ -28,7 +28,7 @@ def main(args):
     oneprong = (nTracks == 1)
     threeprong = (nTracks == 3)
 
-    bins = np.linspace(20, 400, 25)
+    bins = np.linspace(20, 100, 20)
 
     # if args.mode1p:
     #     pass_trk = oneprong
@@ -57,7 +57,7 @@ def main(args):
     ax.set_xlabel(r"Reconstructed tau $p_\mathrm{T}$ / GeV", ha="right", x=1.0)
     ax.set_ylabel("Rejection", ha="right", y=1.0)
 
-    ax.set_xticks([20, 100, 200, 300, 400])
+    #ax.set_xticks([20, 100, 200, 300, 400])
 
     ylim = ax.get_ylim()
     ax.set_ylim(0, 65)

@@ -64,6 +64,14 @@ def main(args):
 
     with h5py.File(args.deco, "r") as f:
         reco = f["score"][...]
+
+        # Set probabilities to zero
+        if args.use_ntracks:
+            oneprong = nTracks == 1
+            threeprong = ~oneprong
+            reco[oneprong, 3:] = 0
+            reco[threeprong, :3] = 0
+
         reco = np.argmax(reco, axis=1)
         reco = reco[mask]
 
@@ -122,6 +130,7 @@ if __name__ == "__main__":
     parser.add_argument("--composition", action="store_true")
     parser.add_argument("--pt", nargs=2, type=float)
     parser.add_argument("--tauid-medium", action="store_true", help="1P eff. 75%%, 3P eff. 60%%")
+    parser.add_argument("--use-ntracks", action="store_true")
 
     args = parser.parse_args()
     main(args)
