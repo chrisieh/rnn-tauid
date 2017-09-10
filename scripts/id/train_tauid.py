@@ -101,7 +101,6 @@ if __name__ == "__main__":
     parser.add_argument("sig", help="Input signal")
     parser.add_argument("bkg", help="Input background")
 
-    parser.add_argument("--preprocessing-track", default="preproc_trk.h5")
     parser.add_argument("--preprocessing-jet", default="preproc_jet.h5")
     parser.add_argument("--model", default="model.h5")
 

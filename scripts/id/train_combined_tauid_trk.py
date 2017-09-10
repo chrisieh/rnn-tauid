@@ -82,16 +82,16 @@ def main(args):
 
     from rnn_tauid.models.combined import combined_rnn_ffnn_two_output_layers
 
-    model = combined_rnn_ffnn_two_output_layers(
-        shape_rnn, shape_ffnn,
-        dense_units_1=32, lstm_units_1=32,
-        dense_units_2_1=128, dense_units_2_2=128,
-        dense_units_3_1=32)
-    
-    # model = combined_rnn_ffnn(
+    # model = combined_rnn_ffnn_two_output_layers(
     #     shape_rnn, shape_ffnn,
     #     dense_units_1=32, lstm_units_1=32,
-    #     dense_units_2_1=128, dense_units_2_2=128, dense_units_2_3=16)
+    #     dense_units_2_1=128, dense_units_2_2=128,
+    #     dense_units_3_1=32)
+
+    model = combined_rnn_ffnn(
+        shape_rnn, shape_ffnn,
+        dense_units_1=32, lstm_units_1=32,
+        dense_units_2_1=128, dense_units_2_2=128, dense_units_2_3=16)
 
     model.summary()
     model.compile(loss="binary_crossentropy", optimizer="adam",

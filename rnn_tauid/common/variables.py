@@ -111,7 +111,59 @@ mEflowApprox_log = partial(
 massTrkSys_log = partial(
     log10_epsilon, var="TauJets/massTrkSys", epsilon=1e-6)
 
+# ID vars transformations
+def centFrac_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/centFrac"].read_direct(dest, source_sel=source_sel,
+                                             dest_sel=dest_sel)
+    np.minimum(dest[dest_sel], 1.0, out=dest[dest_sel])
 
+def etOverPtLeadTrk_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/etOverPtLeadTrk"].read_direct(dest, source_sel=source_sel,
+                                                    dest_sel=dest_sel)
+    np.maximum(dest[dest_sel], 0.1, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+def absipSigLeadTrk_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/absipSigLeadTrk"].read_direct(dest, source_sel=source_sel,
+                                                    dest_sel=dest_sel)
+    np.minimum(dest[dest_sel], 30.0, out=dest[dest_sel])
+
+def EMPOverTrkSysP_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/EMPOverTrkSysP"].read_direct(dest, source_sel=source_sel,
+                                                   dest_sel=dest_sel)
+    np.maximum(dest[dest_sel], 1e-3, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+def ptRatioEflowApprox_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/ptRatioEflowApprox"].read_direct(
+        dest, source_sel=source_sel, dest_sel=dest_sel)
+    np.minimum(dest[dest_sel], 4.0, out=dest[dest_sel])
+
+def mEflowApprox_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/mEflowApprox"].read_direct(dest, source_sel=source_sel,
+                                                 dest_sel=dest_sel)
+    np.maximum(dest[dest_sel], 140.0, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+def ptIntermediateAxis_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/ptIntermediateAxis"].read_direct(
+        dest, source_sel=source_sel, dest_sel=dest_sel)
+    np.maximum(dest[dest_sel] / 1000.0, 100.0, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+def trFlightPathSig_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/trFlightPathSig"].read_direct(dest, source_sel=source_sel,
+                                                    dest_sel=dest_sel)
+    np.maximum(dest[dest_sel], 0.01, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+def massTrkSys_trans(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauJets/massTrkSys"].read_direct(dest, source_sel=source_sel,
+                                               dest_sel=dest_sel)
+    np.maximum(dest[dest_sel], 140.0, out=dest[dest_sel])
+    np.log10(dest[dest_sel], out=dest[dest_sel])
+
+# Old stuff
 def EMPOverTrkSysP_clip_log(datafile, dest, source_sel=None, dest_sel=None):
     datafile["TauJets/EMPOverTrkSysP"].read_direct(dest, source_sel=source_sel,
                                                    dest_sel=dest_sel)
@@ -319,28 +371,28 @@ cluster_vars = [
 ]
 
 id1p_vars = [
-    ("TauJets/centFrac", None, scale_flat),
+    ("TauJets/centFrac", centFrac_trans, scale_flat),
+    ("TauJets/etOverPtLeadTrk", etOverPtLeadTrk_trans, scale_flat),
     ("TauJets/innerTrkAvgDist", None, scale_flat),
+    ("TauJets/absipSigLeadTrk", absipSigLeadTrk_trans, scale_flat),
     ("TauJets/SumPtTrkFrac", None, scale_flat),
-    ("TauJets/etOverPtLeadTrk", etOverPtLeadTrk_log, scale_flat),
-    ("TauJets/absipSigLeadTrk", absipSigLeadTrk_log, scale_flat),
-    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_clip_log, scale_flat),
-    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_log, scale_flat),
-    ("TauJets/mEflowApprox", mEflowApprox_log, scale_flat),
-    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_log, scale_flat)
+    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_trans, scale_flat),
+    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_trans, scale_flat),
+    ("TauJets/mEflowApprox", mEflowApprox_trans, scale_flat),
+    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_trans, scale_flat)
 ]
 
 id3p_vars = [
-    ("TauJets/centFrac", None, scale_flat),
-    ("TauJets/innerTrkAvgDist", None, scale_flat),
-    ("TauJets/SumPtTrkFrac", None, scale_flat),
-    ("TauJets/trFlightPathSig", None, scale_flat),
+    ("TauJets/centFrac", centFrac_trans, scale_flat),
+    ("TauJets/etOverPtLeadTrk", etOverPtLeadTrk_trans, scale_flat),
     ("TauJets/dRmax", None, scale_flat),
-    ("TauJets/massTrkSys", massTrkSys_log, scale_flat),
-    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_clip_log, scale_flat),
-    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_log, scale_flat),
-    ("TauJets/mEflowApprox", mEflowApprox_log, scale_flat),
-    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_log, scale_flat)
+    ("TauJets/trFlightPathSig", trFlightPathSig_trans, scale_flat),
+    ("TauJets/SumPtTrkFrac", None, scale_flat),
+    ("TauJets/EMPOverTrkSysP", EMPOverTrkSysP_trans, scale_flat),
+    ("TauJets/ptRatioEflowApprox", ptRatioEflowApprox_trans, scale_flat),
+    ("TauJets/mEflowApprox", mEflowApprox_trans, scale_flat),
+    ("TauJets/ptIntermediateAxis", ptIntermediateAxis_trans, scale_flat),
+    ("TauJets/massTrkSys", massTrkSys_trans, scale_flat)
 ]
 
 charged_pfo_vars = [

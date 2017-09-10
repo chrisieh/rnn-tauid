@@ -31,13 +31,14 @@ fbkg_1p = "/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev_flat/bkg1P_v08_%d.h
 fsig_3p = "/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev_flat/sig3P_v08_%d.h5"
 fbkg_3p = "/lustre/atlas/group/higgs/cdeutsch/StreamTauIDDev_flat/bkg3P_v08_%d.h5"
 
-prefix_1p = "/lustre/user/cdeutsch/rnn_tauid/cluster_only/1p/new_baseline"
+prefix_1p = "/lustre/user/cdeutsch/rnn_tauid/combined/1p/track_cluster_mlp/test"
 sig_deco_1p = os.path.join(prefix_1p, "sig_pred.h5")
 bkg_deco_1p = os.path.join(prefix_1p, "bkg_pred.h5")
 
-prefix_3p = "/lustre/user/cdeutsch/rnn_tauid/cluster_only/3p/new_baseline"
+prefix_3p = "/lustre/user/cdeutsch/rnn_tauid/combined/3p/track_cluster_mlp/test"
 sig_deco_3p = os.path.join(prefix_3p, "sig_pred.h5")
 bkg_deco_3p = os.path.join(prefix_3p, "bkg_pred.h5")
+
 
 # BDT comparison
 prefix_bdt_1p = "/lustre/user/cdeutsch/bdt_tauid/variable_importance/1p/iter_1/decorated_ntuples"
@@ -123,19 +124,19 @@ ax.set_ylim(1, 1e4)
 
 ax.plot(eff_bdt_1p, rej_bdt_1p, c="C0", label="BDT 1P")
 ax.plot(eff_bdt_3p, rej_bdt_3p, c="C3",label="BDT 3P")
-ax.plot(eff_1p, rej_1p, c="C1",label="Cluster-RNN 1P")
-ax.plot(eff_3p, rej_3p, c="C2",label="Cluster-RNN 3P")
+ax.plot(eff_1p, rej_1p, c="C1",label="Track-RNN 1P")
+ax.plot(eff_3p, rej_3p, c="C2",label="Track-RNN 3P")
 
 ax.set_xlabel("Signal efficiency", ha="right", x=1)
 ax.set_ylabel("Rejection", ha="right", y=1)
-ax.legend(loc="lower left")
+ax.legend()
 
 fig.savefig("roc.pdf")
 
 
 # Bootstrap ratios
 n_bootstrap = 10
-x = np.linspace(0.008, 1.0, 100)
+x = np.linspace(0.03, 1.0, 100)
 
 # Bootstrap 1-prongs
 ratio_1p = []
@@ -171,8 +172,8 @@ ax0 = plt.subplot(gs[0])
 ax0.tick_params(labelbottom="off")
 ax0.set_ylabel("Rejection ratio", ha="right", y=1)
 ax0.set_xlim(0, 1)
-ax0.set_ylim(-0.05, 0.65)
-ax0.set_yticks([0.0, 0.2, 0.4, 0.6])
+ax0.set_ylim(1.0, 2.5)
+
 ax0.text(0.94, 0.86, "1-prong", ha="right", va="top", fontsize=8,
          transform=ax0.transAxes)
 
@@ -183,8 +184,8 @@ ax1 = plt.subplot(gs[1])
 ax1.set_xlabel("Signal efficiency", ha="right", x=1)
 #ax1.set_ylabel("Ratio", ha="right", y=1)
 ax1.set_xlim(0, 1)
-ax1.set_ylim(-0.01, 0.16)
-ax1.set_yticks([0.0, 0.05, 0.1, 0.15])
+ax1.set_ylim(0.9, 2.0)
+#ax1.set_yticks([0.8, 0.9, 1.0, 1.1, 1.2])
 ax1.text(0.94, 0.86, "3-prong", ha="right", va="top", fontsize=8,
          transform=ax1.transAxes)
 
