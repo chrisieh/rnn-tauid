@@ -206,6 +206,10 @@ void AnalysisSelector::set_branches() {
         "TauTracks.nPixelHits", &v_trk_nPixelHits);
     b_trk_nSCTHits = fOutTree->Branch(
         "TauTracks.nSCTHits", &v_trk_nSCTHits);
+    b_trk_isLoose = fOutTree->Branch(
+        "TauTracks.isLoose", &v_trk_isLoose);
+    b_trk_passVertexCut = fOutTree->Branch(
+        "TauTracks.passVertexCut", &v_trk_passVertexCut);
 
 
     b_cls_e = fOutTree->Branch(
@@ -306,6 +310,8 @@ void AnalysisSelector::clear_vectors() {
     v_trk_nInnermostPixelHits.clear();
     v_trk_nPixelHits.clear();
     v_trk_nSCTHits.clear();
+    v_trk_isLoose.clear();
+    v_trk_passVertexCut.clear();
 
     // Clear cluster vectors
     v_cls_e.clear();

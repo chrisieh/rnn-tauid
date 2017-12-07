@@ -211,6 +211,8 @@ class AnalysisSelector : public TSelector
     TBranch *b_trk_nInnermostPixelHits = 0;
     TBranch *b_trk_nPixelHits = 0;
     TBranch *b_trk_nSCTHits = 0;
+    TBranch *b_trk_isLoose = 0;
+    TBranch *b_trk_passVertexCut = 0;
 
     // Cluster branches
     TBranch *b_cls_e = 0;
