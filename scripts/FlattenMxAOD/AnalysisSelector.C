@@ -148,6 +148,8 @@ void AnalysisSelector::set_branches() {
         "TauJets.etaJetSeed", &v_etaJetSeed, "TauJets.etaJetSeed/F");
     b_phiJetSeed = fOutTree->Branch(
         "TauJets.phiJetSeed", &v_phiJetSeed, "TauJets.phiJetSeed/F");
+    b_BDTJetScore = fOutTree->Branch(
+        "TauJets.BDTJetScore", &v_BDTJetScore, "TauJets.BDTJetScore/F");
     b_nTracksTotal = fOutTree->Branch(
         "TauJets.nTracksTotal", &v_trk_nTracksTotal, "TauJets.nTracksTotal/I");
     b_cls_nClustersTotal = fOutTree->Branch(
@@ -248,6 +250,7 @@ void AnalysisSelector::fill_tau(size_t itau) {
     v_ptJetSeed = reader_ptJetSeed[itau];
     v_etaJetSeed = reader_etaJetSeed[itau];
     v_phiJetSeed = reader_phiJetSeed[itau];
+    v_BDTJetScore = reader_BDTJetScore[itau];
     v_trk_nTracksTotal = reader_trk_nTracksTotal[itau];
     v_cls_nClustersTotal = reader_cls_nClustersTotal[itau];
 

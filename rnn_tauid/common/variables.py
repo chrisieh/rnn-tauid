@@ -363,11 +363,11 @@ cluster_vars = [
     ("TauClusters/SECOND_R", SECOND_R_log, partial(scale, per_obj=False)),
     ("TauClusters/SECOND_LAMBDA", SECOND_LAMBDA_log,
      partial(scale, per_obj=False)),
-    ("TauClusters/FIRST_ENG_DENS", FIRST_ENG_DENS_log,
-     partial(scale, per_obj=False)),
+#    ("TauClusters/FIRST_ENG_DENS", FIRST_ENG_DENS_log,
+#     partial(scale, per_obj=False)),
     ("TauClusters/CENTER_LAMBDA", CENTER_LAMBDA_log,
      partial(scale, per_obj=False)),
-    ("TauClusters/ENG_FRAC_MAX", None, None)
+#    ("TauClusters/ENG_FRAC_MAX", None, None)
 ]
 
 id1p_vars = [

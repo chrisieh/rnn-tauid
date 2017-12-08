@@ -27,8 +27,8 @@ def get_args():
 # Global config
 treename = "CollectionTree"
 default_value = 0
-n_tracks = 15
-n_clusters = 15
+n_tracks = 12
+n_clusters = 8
 
 
 # h5py dataset kwargs

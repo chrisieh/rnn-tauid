@@ -56,8 +56,10 @@ class AnalysisSelector : public TSelector
     TRA_float reader_phiJetSeed = {fReader, "TauJetsAuxDyn.trk_phiJetSeed"};
     TRA_float reader_eta = {fReader, "TauJetsAuxDyn.eta"};
     TRA_float reader_phi = {fReader, "TauJetsAuxDyn.phi"};
+    TRA_float reader_BDTJetScore = {fReader, "TauJetsAuxDyn.BDTJetScore"};
     TRA_uint8 reader_trk_nTracksTotal = {fReader, "TauJetsAuxDyn.trk_nTracksTotal"};
     TRA_uint8 reader_cls_nClustersTotal = {fReader, "TauJetsAuxDyn.cls_nClustersTotal"};
+
 
     // Variables needed for regular ID
     TRA_double reader_mu = {fReader, "TauJetsAuxDyn.mu"};
@@ -120,6 +122,7 @@ class AnalysisSelector : public TSelector
     float v_phiJetSeed;
     float v_eta;
     float v_phi;
+    float v_BDTJetScore;
     int v_trk_nTracksTotal;
     int v_cls_nClustersTotal;
 
@@ -181,6 +184,7 @@ class AnalysisSelector : public TSelector
     TBranch *b_ptJetSeed = 0;
     TBranch *b_etaJetSeed = 0;
     TBranch *b_phiJetSeed = 0;
+    TBranch *b_BDTJetScore = 0;
     TBranch *b_nTracksTotal = 0;
     TBranch *b_cls_nClustersTotal = 0;
 
