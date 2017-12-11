@@ -13,15 +13,6 @@ class Flattener:
 
         self.cutmap = None
 
-    def _clip_binnumber(self, binnumber):
-        y_bin_idx, x_bin_idx = np.unravel_index(
-            binnumber, (len(self.y_bins) + 1, len(self.x_bins) + 1))
-
-        x_idx = np.clip(x_bin_idx - 1, 0, len(self.x_bins) - 2)
-        y_idx = np.clip(y_bin_idx - 1, 0, len(self.y_bins) - 2)
-
-        return x_idx, y_idx
-
     def fit(self, x, y, values):
         """
         Fits the flattener.
@@ -34,11 +25,12 @@ class Flattener:
         statistic, _, _, binnumber = binned_statistic_2d(
             x, y, values,
             statistic=lambda arr: np.percentile(arr, 100 * (1 - self.eff)),
-            bins=[self.x_bins, self.y_bins]
+            bins=[self.x_bins, self.y_bins],
+            expand_binnumbers=True
         )
 
         self.cutmap = statistic
-        x_idx, y_idx = self._clip_binnumber(binnumber)
+        x_idx, y_idx = binnumber[0, :] - 1, binnumber[1, :] - 1
 
         return values > self.cutmap[x_idx, y_idx]
 
@@ -57,9 +49,10 @@ class Flattener:
         _, _, _, binnumber = binned_statistic_2d(
             x, y, values,
             statistic="count",
-            bins=[self.x_bins, self.y_bins]
+            bins=[self.x_bins, self.y_bins],
+            expand_binnumbers=True
         )
 
-        x_idx, y_idx = self._clip_binnumber(binnumber)
+        x_idx, y_idx = binnumber[0, :] - 1, binnumber[1, :] - 1
 
         return values > self.cutmap[x_idx, y_idx]
