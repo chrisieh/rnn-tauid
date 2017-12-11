@@ -73,6 +73,11 @@ def pt_jetseed_log(datafile, dest, source_sel=None, dest_sel=None):
     dest[dest_sel] = np.log10(pt[:, np.newaxis])
 
 
+def d0sig_clip(datafile, dest, source_sel=None, dest_sel=None):
+    datafile["TauTracks/d0sig"].read_direct(dest, source_sel=source_sel, dest_sel=dest_sel)
+    np.clip(dest[dest_sel], -10., 10., out=dest[dest_sel])
+
+
 # Cluster variables
 et_log = partial(
     log10_epsilon, var="TauClusters/et")
