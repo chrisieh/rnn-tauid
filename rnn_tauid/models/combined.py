@@ -1,7 +1,7 @@
 from keras.models import Model
 from keras.layers import Input, Dense, LSTM, Masking, \
-                         TimeDistributed, merge, Bidirectional, \
-                         Dropout
+                         TimeDistributed, Bidirectional, \
+                         Dropout, concatenate
 from keras.constraints import max_norm
 
 
@@ -31,7 +31,7 @@ def combined_rnn_ffnn(
     dense_2_3 = Dense(dense_units_2_3, activation="relu")(dense_2_2)
 
     # Merge
-    merged_branches = merge([lstm_1, dense_2_3], mode="concat")
+    merged_branches = concatenate([lstm_1, dense_2_3])
 
     y = Dense(1, activation="sigmoid")(merged_branches)
 
@@ -67,7 +67,7 @@ def combined_rnn_ffnn_aux_loss(
     aux_out = Dense(1, activation="sigmoid")(dense_2_2)
 
     # Merge
-    merged_branches = merge([lstm_1, dense_2_3], mode="concat")
+    merged_branches = concatenate([lstm_1, dense_2_3])
 
     y = Dense(1, activation="sigmoid")(merged_branches)
 
@@ -100,7 +100,7 @@ def combined_rnn_ffnn_two_output_layers(
     dense_2_2 = Dense(dense_units_2_2, activation="relu")(dense_2_1)
 
     # Merge
-    merged_branches = merge([lstm_1, dense_2_2], mode="concat")
+    merged_branches = concatenate([lstm_1, dense_2_2])
     dense_3_1 = Dense(dense_units_3_1, activation="relu")(merged_branches)
     y = Dense(1, activation="sigmoid")(dense_3_1)
 
@@ -136,7 +136,7 @@ def combined_2rnn_multiclass(
                   go_backwards=backwards)(shared_dense_2)
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2])
 
     y = Dense(n_classes, activation="softmax")(merged_branches)
 
@@ -173,7 +173,7 @@ def combined_2rnn_2final_dense_multiclass(
                   go_backwards=backwards)(shared_dense_2)
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2])
 
     dense_1 = Dense(final_dense_units_1, activation="tanh")(merged_branches)
     dense_2 = Dense(final_dense_units_2, activation="tanh")(dense_1)
@@ -217,7 +217,7 @@ def combined_2rnn_2final_dense_multiclass_bidirectional_stacked(
             bidirectional_lstm_2_1)
 
     # Merge
-    merged_branches = merge([lstm_1, bidirectional_lstm_2_2], mode="concat")
+    merged_branches = concatenate([lstm_1, bidirectional_lstm_2_2])
 
     dense_1 = Dense(final_dense_units_1, activation="tanh")(merged_branches)
     dense_2 = Dense(final_dense_units_2, activation="tanh")(dense_1)
@@ -266,7 +266,7 @@ def combined_3rnn_2final_dense_multiclass(
                   go_backwards=backwards)(shared_dense_3)
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2, lstm_3], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2, lstm_3])
 
     dense_1 = Dense(final_dense_units_1, activation="tanh")(merged_branches)
     dense_2 = Dense(final_dense_units_2, activation="tanh")(dense_1)
@@ -325,7 +325,7 @@ def combined_4rnn_2final_dense_multiclass(
 
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2, lstm_3, lstm_4], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2, lstm_3, lstm_4])
 
     dense_1 = Dense(final_dense_units_1, activation="tanh")(merged_branches)
     dense_2 = Dense(final_dense_units_2, activation="tanh")(dense_1)
@@ -365,7 +365,7 @@ def combined_2rnn_final_dense_multiclass(
                   go_backwards=backwards)(shared_dense_2)
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2])
 
     dense_1 = Dense(final_dense_units_1, activation="tanh")(merged_branches)
 
@@ -409,7 +409,7 @@ def combined_2rnn_ffnn(
     dense_3_3 = Dense(dense_units_3_3, activation="relu")(dense_3_2)
 
     # Merge
-    merged_branches = merge([lstm_1, lstm_2, dense_3_3], mode="concat")
+    merged_branches = concatenate([lstm_1, lstm_2, dense_3_3])
 
     y = Dense(1, activation="sigmoid")(merged_branches)
 
