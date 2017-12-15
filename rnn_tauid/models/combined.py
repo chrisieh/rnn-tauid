@@ -416,6 +416,59 @@ def combined_2rnn_ffnn(
     return Model(input=[x_1, x_2, x_3], output=y)
 
 
+def combined_2rnn_ffnn_experimental(
+        input_shape_1, input_shape_2, input_shape_3,
+        dense_units_1=32, lstm_units_1=32,
+        dense_units_2=32, lstm_units_2=32,
+        dense_units_3_1=128, dense_units_3_2=128, dense_units_3_3=16,
+        backwards=False, mask_value=0.0, unroll=True):
+    """
+    Network with two parallel branches
+
+    Parameters:
+    -----------
+    """
+    # Branch 1
+    x_1 = Input(shape=input_shape_1)
+    mask_1 = Masking(mask_value=mask_value)(x_1)
+    shared_dense_1 = TimeDistributed(
+        Dense(dense_units_1, activation="relu"))(mask_1)
+    shared_dense_1_1 = TimeDistributed(
+        Dense(dense_units_1, activation="relu"))(shared_dense_1)
+    lstm_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
+                  go_backwards=backwards, activation="relu",
+                  return_sequences=True)(shared_dense_1_1)
+    lstm_1_1 = LSTM(output_dim=lstm_units_1, unroll=unroll,
+                    go_backwards=backwards, activation="relu")(lstm_1)
+
+    # Branch 2
+    x_2 = Input(shape=input_shape_2)
+    mask_2 = Masking(mask_value=mask_value)(x_2)
+    shared_dense_2 = TimeDistributed(
+        Dense(dense_units_2, activation="relu"))(mask_2)
+    shared_dense_2_1 = TimeDistributed(
+        Dense(dense_units_2, activation="relu"))(shared_dense_2)
+    lstm_2 = LSTM(output_dim=lstm_units_2, unroll=unroll,
+                  go_backwards=backwards, activation="relu",
+                  return_sequences=True)(shared_dense_2_1)
+    lstm_2_1 = LSTM(output_dim=lstm_units_2, unroll=unroll,
+                    go_backwards=backwards, activation="relu")(lstm_2)
+
+    # Branch 3
+    x_3 = Input(shape=input_shape_3)
+    dense_3_1 = Dense(dense_units_3_1, activation="relu")(x_3)
+    dense_3_2 = Dense(dense_units_3_2, activation="relu")(dense_3_1)
+    dense_3_3 = Dense(dense_units_3_3, activation="relu")(dense_3_2)
+
+    # Merge
+    merged_branches = concatenate([lstm_1_1, lstm_2_1, dense_3_3])
+    dense_1 = Dense(64, activation="relu")(merged_branches)
+    dense_2 = Dense(32, activation="relu")(dense_1)
+    y = Dense(1, activation="sigmoid")(dense_2)
+
+    return Model(input=[x_1, x_2, x_3], output=y)
+
+
 def combined_2rnn_ffnn_relu(
         input_shape_1, input_shape_2, input_shape_3,
         dense_units_1=32, lstm_units_1=32,
